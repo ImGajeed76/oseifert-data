@@ -4,7 +4,6 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { getLanguageColor } from './colors';
 
-// Define types for our portfolio system (copied from your existing code)
 interface Language {
 	name: string;
 	bytes: number;
