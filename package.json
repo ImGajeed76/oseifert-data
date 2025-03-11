@@ -1,0 +1,15 @@
+{
+  "name": "oseifert-data",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.1.1",
+    "@octokit/webhooks-types": "^7.6.1"
+  }
+}
