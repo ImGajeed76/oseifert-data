@@ -1,0 +1,70 @@
+[
+  {
+    "id": "933782301",
+    "title": "TFUtils-Go",
+    "description": "A high-performance Go rewrite of the popular TFUtils project, designed to help TFBern students manage their projects more efficiently with improved performance, easier distribution, and a user-friendly interface.",
+    "mainContent": "# 🚀 TFUtils-Go\n\nTFUtils-Go is a powerful Go rewrite of the popular TFUtils project, designed to help TFBern students manage their\nprojects more efficiently. This new version brings improved performance, easier distribution, and maintains the\nuser-friendly approach of the original - now powered by Go!\n\n## ✨ Features\n\n- ⚡ **High Performance** - Lightning-fast operations with Go's speed\n- 🎯 **Simple Interface** - Maintaining the user-friendly approach of TFUtils\n- 📦 **Easy Distribution** - Single binary deployment for all platforms\n- 🛠️ **Enhanced Reliability** - Leveraging Go's strong type system and error handling\n\n## 🎯 Project Status\n\n⚠️ **Early Alpha Stage**\n\nThis project is currently in early development. Features and APIs may change significantly. We recommend using the\noriginal TFUtils for production environments until the Go version reaches stable release.\n\n## 🚀 Quick Start\n\nComing soon! The installation process will be as simple as:\n\n```bash\n# Download options will be available soon\n# For now, you can build from source:\ngo install github.com/ImGajeed76/tfutils-go@latest\n```\n\n## 🌟 Why Go?\n\nThe transition to Go brings several advantages:\n\n- **Faster Execution** - Native compilation for better performance\n- **Simpler Distribution** - Single binary deployment\n- **Cross-Platform** - Easy builds for all major platforms\n- **Robust Error Handling** - Improved reliability and debugging\n- **Maintainable Codebase** - Clean, structured Go code\n\n## 📚 Documentation\n\nDocumentation is under development. Once released, you'll find:\n\n- Installation guides\n- Migration from Python TFUtils\n- Usage examples\n- API reference\n- Best practices\n\n## 🛠️ Building from Source\n\n```bash\n# Clone the repository\ngit clone https://github.com/ImGajeed76/tfutils-go\ncd tfutils-go\n\n# Build\ngo build\n\n# Run\n./tfutils-go\n```\n\n## 💬 Support & Community\n\n- 📝 [Report Issues](https://github.com/ImGajeed76/tfutils-go/issues)\n- 💡 [Feature Requests](https://github.com/ImGajeed76/tfutils-go/issues)\n- 📧 Contact: [ImGajeed76](mailto:github.staging362@passmail.net)\n\n## 🤝 Contributing\n\nContributions are welcome! As we're in early development, please:\n\n1. Open an issue to discuss proposed changes\n2. Fork the repository\n3. Create a feature branch\n4. Submit a Pull Request\n\n## 📄 License\n\nTFUtils-Go is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.\n\n---\n\n🌟 **Purpose**: Bringing the power and simplicity of TFUtils to Go, making project management even more efficient for\nTFBern students.\n\n⚠️ **Note**: This is an alpha release. The project is under active development, and we welcome your feedback and\ncontributions!\n\nBuilt with ❤️ in Switzerland by ImGajeed76",
+    "repoUrl": "https://github.com/ImGajeed76/tfutils-go",
+    "createdAt": "2025-02-16T17:19:07Z",
+    "updatedAt": "2025-03-11T14:40:12Z",
+    "languages": [
+      {
+        "name": "Go",
+        "bytes": 8443,
+        "percentage": 100,
+        "color": "#00ADD8"
+      }
+    ],
+    "primaryLanguage": {
+      "name": "Go",
+      "bytes": 8443,
+      "percentage": 100,
+      "color": "#00ADD8"
+    },
+    "stars": 1,
+    "forks": 1
+  },
+  {
+    "id": "851103459",
+    "title": "TF Utils",
+    "description": "A user-friendly tool that helps TFBern students manage their projects more efficiently. Perfect for both beginners and advanced users, TF Utils streamlines project workflows with its intuitive interface and powerful features.",
+    "mainContent": "# TF Utils\n\nA user-friendly tool that helps TFBern students manage their projects more efficiently. Perfect for both beginners and advanced users!\n\n## Project Overview\n\nTF Utils was created to simplify project management for TFBern students. The tool addresses common pain points in the development workflow and provides an intuitive interface that works for users of all experience levels.\n\n## Key Features\n\n- **Simple Installation**: Quick setup process with PATH integration\n- **Intuitive Interface**: Access powerful features directly from your project folder\n- **Comprehensive Documentation**: Detailed guides for all user levels\n- **Active Community**: Ongoing support and development\n\n## Getting Started\n\n### 🚀 Quick Start\n1. Download the latest installer from our [releases page](https://github.com/ImGajeed76/tfUtils/releases)\n2. Run the installer (make sure to check \"Add to PATH\" ✅)\n3. Open your project folder and type `tfutils` in the address bar\n\nThat's it! You're ready to go! 🎉\n\n## Resources\n\n### 📚 Documentation\n**[Visit our Documentation Site](https://imgajeed76.github.io/tfUtils/)** for:\n- Detailed installation instructions\n- User guides and tutorials\n- Developer documentation\n- Examples and best practices\n- Troubleshooting tips\n\n### 💬 Support & Community\n- 📝 [Report Issues](https://github.com/ImGajeed76/tfUtils/issues)\n- 💡 [Join Discussions](https://github.com/ImGajeed76/tfUtils/discussions)\n- 📧 Contact: [ImGajeed76](mailto:github.staging362@passmail.net)\n\n## Technical Information\n\nTF Utils is built with a focus on performance and extensibility, making it suitable for projects of all sizes.\n\n## 📄 License\nTF Utils is licensed under the GNU GPL v3.0. See [LICENSE](LICENSE) for details.",
+    "repoUrl": "https://github.com/ImGajeed76/tfUtils",
+    "createdAt": "2024-09-02T12:35:46Z",
+    "updatedAt": "2025-03-11T10:47:47Z",
+    "languages": [
+      {
+        "name": "Python",
+        "bytes": 116290,
+        "percentage": 92.66947700595271,
+        "color": "#3572A5"
+      },
+      {
+        "name": "Jinja",
+        "bytes": 7094,
+        "percentage": 5.653085130967654,
+        "color": "#a52a22"
+      },
+      {
+        "name": "Batchfile",
+        "bytes": 1512,
+        "percentage": 1.2048864840743012,
+        "color": "#C1F12E"
+      },
+      {
+        "name": "CMake",
+        "bytes": 593,
+        "percentage": 0.4725513790053312,
+        "color": "#DA3434"
+      }
+    ],
+    "primaryLanguage": {
+      "name": "Python",
+      "bytes": 116290,
+      "percentage": 92.66947700595271,
+      "color": "#3572A5"
+    },
+    "stars": 3,
+    "forks": 1
+  }
+]
