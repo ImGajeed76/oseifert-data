@@ -178,7 +178,7 @@
         "url": "https://github.com/ImGajeed76/discountdb"
       },
       {
-        "name": "BF Script",
+        "name": "BFScript",
         "platform": "github",
         "stars": 4,
         "forks": 0,
@@ -199,7 +199,7 @@
         "url": "https://github.com/ImGajeed76/top-issues"
       },
       {
-        "name": "TfUtils",
+        "name": "TF Utils",
         "platform": "github",
         "stars": 3,
         "forks": 1,
@@ -244,5 +244,5 @@
       "Apache License 2.0": 1
     }
   },
-  "fetchedAt": "2025-10-20T12:24:44.665Z"
+  "fetchedAt": "2025-10-20T13:04:24.259Z"
 }

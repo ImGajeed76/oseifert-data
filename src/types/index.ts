@@ -72,7 +72,7 @@ export interface PlatformInfo {
 // Markdown Frontmatter
 export interface MarkdownFrontmatter {
   title: string;
-  repoUrl: string;           // Full URL to repo (any platform)
+  repoUrl?: string;          // Full URL to repo (any platform)
   liveUrl?: string;
   role: string;
   technologies: string[];

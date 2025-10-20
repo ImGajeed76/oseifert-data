@@ -48,6 +48,27 @@ async function main() {
     try {
       console.log(`  Processing ${filename}...`);
       
+      // Skip projects without repo URL
+      if (!parsed.frontmatter.repoUrl) {
+        console.log(`  ⚠ No repo URL for ${filename}, skipping API fetch...`);
+        // Create a minimal project without repo data
+        const project = transformToCuratedProject(
+          parsed,
+          null, // no repo data
+          null, // no stats
+          '',   // no readme
+          null, // no license
+          {
+            type: 'unknown',
+            url: '',
+            apiAvailable: false
+          }
+        );
+        curatedProjects.push(project);
+        console.log(`  ✓ ${project.title} (no repo)`);
+        continue;
+      }
+      
       // Parse repo URL
       const platformInfo = parseGitUrl(parsed.frontmatter.repoUrl);
       if (!platformInfo) {
@@ -90,10 +111,12 @@ async function main() {
     }
   }
 
-  // Sort by lastUpdated (descending)
-  curatedProjects.sort((a, b) => 
-    new Date(b.stats.lastUpdated).getTime() - new Date(a.stats.lastUpdated).getTime()
-  );
+  // Sort by lastUpdated (descending), handling projects without repos
+  curatedProjects.sort((a, b) => {
+    const aDate = a.stats?.lastUpdated ? new Date(a.stats.lastUpdated).getTime() : 0;
+    const bDate = b.stats?.lastUpdated ? new Date(b.stats.lastUpdated).getTime() : 0;
+    return bDate - aDate;
+  });
 
   console.log(`✓ Processed ${curatedProjects.length} curated projects\n`);
 

@@ -30,9 +30,6 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   if (!frontmatter.title) {
     throw new Error('Missing required field: title');
   }
-  if (!frontmatter.repoUrl) {
-    throw new Error('Missing required field: repoUrl');
-  }
 
   return {
     frontmatter,

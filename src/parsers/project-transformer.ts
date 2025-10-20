@@ -163,15 +163,34 @@ export function transformToAllProject(
 // Create CuratedProject from markdown + repo data
 export function transformToCuratedProject(
   markdown: ParsedMarkdown,
-  repo: RepoData,
-  stats: RepoStats,
+  repo: RepoData | null,
+  stats: RepoStats | null,
   readme: string,
   license: LicenseData | null,
   platform: PlatformInfo
 ): CuratedProject {
+  // Generate a slug from title for projects without repos
+  const projectSlug = repo?.name || markdown.frontmatter.title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-');
+
+  // Default stats for projects without repos
+  const defaultStats: RepoStats = {
+    stars: 0,
+    forks: 0,
+    watchers: 0,
+    openIssues: 0,
+    lastUpdated: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    size: 0,
+    language: 'Unknown',
+    languages: []
+  };
+
   return {
     title: markdown.frontmatter.title,
-    portfolioUrl: `/projects/${repo.name}`,
+    portfolioUrl: `/projects/${projectSlug}`,
     repoUrl: markdown.frontmatter.repoUrl,
     liveUrl: markdown.frontmatter.liveUrl,
     description: markdown.description,
@@ -181,7 +200,7 @@ export function transformToCuratedProject(
     content: markdown.content,
     readme,
     license,
-    stats,
+    stats: stats || defaultStats,
     platform
   };
 }
