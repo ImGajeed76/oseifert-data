@@ -1,7 +1,13 @@
 {
   "name": "oseifert-data",
-  "module": "index.ts",
+  "version": "2.0.0",
+  "description": "Modular, platform-agnostic portfolio data fetcher supporting GitHub, GitLab, Gitea, Forgejo, and Codeberg",
+  "module": "src/index.ts",
   "type": "module",
+  "scripts": {
+    "fetch": "bun run src/index.ts",
+    "build": "bun run src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -10,6 +16,8 @@
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
-    "@octokit/webhooks-types": "^7.6.1"
+    "@octokit/types": "^15.0.0",
+    "@octokit/webhooks-types": "^7.6.1",
+    "yaml": "^2.8.1"
   }
 }

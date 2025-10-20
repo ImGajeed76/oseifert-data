@@ -1,0 +1,248 @@
+{
+  "platforms": {
+    "github": {
+      "username": "ImGajeed76",
+      "name": "Oliver Seifert",
+      "bio": "",
+      "location": "Switzerland",
+      "company": "Axonotes",
+      "website": "oseifert.ch",
+      "publicRepos": 62,
+      "followers": 8,
+      "following": 10,
+      "createdAt": "2020-11-20T19:42:44Z",
+      "profileUrl": "https://github.com/ImGajeed76"
+    }
+  },
+  "aggregated": {
+    "totalRepos": 62,
+    "totalStars": 59,
+    "totalForks": 7,
+    "languageBreakdown": {
+      "TypeScript": {
+        "bytes": 3383693,
+        "repos": 15
+      },
+      "Python": {
+        "bytes": 3705060,
+        "repos": 25
+      },
+      "Svelte": {
+        "bytes": 590479,
+        "repos": 7
+      },
+      "CSS": {
+        "bytes": 31461,
+        "repos": 13
+      },
+      "JavaScript": {
+        "bytes": 292177,
+        "repos": 21
+      },
+      "HTML": {
+        "bytes": 27098,
+        "repos": 15
+      },
+      "MDX": {
+        "bytes": 1987309,
+        "repos": 2
+      },
+      "Go": {
+        "bytes": 286903,
+        "repos": 3
+      },
+      "Rust": {
+        "bytes": 5460680,
+        "repos": 2
+      },
+      "C#": {
+        "bytes": 591030,
+        "repos": 2
+      },
+      "C": {
+        "bytes": 14395,
+        "repos": 1
+      },
+      "Perl": {
+        "bytes": 4655,
+        "repos": 1
+      },
+      "Jinja": {
+        "bytes": 7094,
+        "repos": 1
+      },
+      "Swift": {
+        "bytes": 5242,
+        "repos": 1
+      },
+      "SCSS": {
+        "bytes": 140503,
+        "repos": 1
+      },
+      "GLSL": {
+        "bytes": 4544,
+        "repos": 3
+      },
+      "Genero Forms": {
+        "bytes": 90,
+        "repos": 1
+      },
+      "WGSL": {
+        "bytes": 1841,
+        "repos": 1
+      },
+      "Kotlin": {
+        "bytes": 120425,
+        "repos": 3
+      },
+      "Java": {
+        "bytes": 17028,
+        "repos": 1
+      }
+    },
+    "mostUsedLanguages": [
+      {
+        "language": "Rust",
+        "repoCount": 2,
+        "totalBytes": 5460680,
+        "percentage": 32.75417448255299
+      },
+      {
+        "language": "Python",
+        "repoCount": 25,
+        "totalBytes": 3705060,
+        "percentage": 22.223639127055193
+      },
+      {
+        "language": "TypeScript",
+        "repoCount": 15,
+        "totalBytes": 3383693,
+        "percentage": 20.29602007760813
+      },
+      {
+        "language": "MDX",
+        "repoCount": 2,
+        "totalBytes": 1987309,
+        "percentage": 11.920249078273748
+      },
+      {
+        "language": "C#",
+        "repoCount": 2,
+        "totalBytes": 591030,
+        "percentage": 3.545107888472368
+      },
+      {
+        "language": "Svelte",
+        "repoCount": 7,
+        "totalBytes": 590479,
+        "percentage": 3.5418028879706203
+      },
+      {
+        "language": "JavaScript",
+        "repoCount": 21,
+        "totalBytes": 292177,
+        "percentage": 1.75253199927278
+      },
+      {
+        "language": "Go",
+        "repoCount": 3,
+        "totalBytes": 286903,
+        "percentage": 1.7208975661580423
+      },
+      {
+        "language": "SCSS",
+        "repoCount": 1,
+        "totalBytes": 140503,
+        "percentage": 0.8427631315737495
+      },
+      {
+        "language": "Kotlin",
+        "repoCount": 3,
+        "totalBytes": 120425,
+        "percentage": 0.7223315524918954
+      }
+    ],
+    "topRepositories": [
+      {
+        "name": "Discountdb Api",
+        "platform": "github",
+        "stars": 16,
+        "forks": 1,
+        "url": "https://github.com/ImGajeed76/discountdb-api"
+      },
+      {
+        "name": "Discountdb",
+        "platform": "github",
+        "stars": 8,
+        "forks": 1,
+        "url": "https://github.com/ImGajeed76/discountdb"
+      },
+      {
+        "name": "BF Script",
+        "platform": "github",
+        "stars": 4,
+        "forks": 0,
+        "url": "https://github.com/ImGajeed76/bfscript"
+      },
+      {
+        "name": "Athena_v2",
+        "platform": "github",
+        "stars": 4,
+        "forks": 0,
+        "url": "https://github.com/ImGajeed76/athena_v2"
+      },
+      {
+        "name": "Top Issues",
+        "platform": "github",
+        "stars": 3,
+        "forks": 0,
+        "url": "https://github.com/ImGajeed76/top-issues"
+      },
+      {
+        "name": "TfUtils",
+        "platform": "github",
+        "stars": 3,
+        "forks": 1,
+        "url": "https://github.com/ImGajeed76/tfUtils"
+      },
+      {
+        "name": "Create Dc Client",
+        "platform": "github",
+        "stars": 3,
+        "forks": 1,
+        "url": "https://github.com/ImGajeed76/create-dc-client"
+      },
+      {
+        "name": "Pse Search",
+        "platform": "github",
+        "stars": 3,
+        "forks": 0,
+        "url": "https://github.com/ImGajeed76/pse-search"
+      },
+      {
+        "name": "Athena",
+        "platform": "github",
+        "stars": 3,
+        "forks": 0,
+        "url": "https://github.com/ImGajeed76/athena"
+      },
+      {
+        "name": "Capitaldotcom",
+        "platform": "github",
+        "stars": 2,
+        "forks": 1,
+        "url": "https://github.com/ImGajeed76/capitaldotcom"
+      }
+    ],
+    "licenseBreakdown": {
+      "GNU General Public License v3.0": 9,
+      "MIT License": 5,
+      "GNU Affero General Public License v3.0": 1,
+      "None": 43,
+      "ISC License": 1,
+      "Other": 2,
+      "Apache License 2.0": 1
+    }
+  },
+  "fetchedAt": "2025-10-20T12:24:44.665Z"
+}
