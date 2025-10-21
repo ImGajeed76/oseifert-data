@@ -1,6 +1,8 @@
 name: Update Portfolio Data
 
 on:
+  schedule:
+    - cron: '0 */24 * * *'  # Run every 24 hours
   workflow_dispatch:  # Allow manual trigger
   push:
     branches: [main, master]  # Run on pushes to main/master
