@@ -44,7 +44,7 @@ jobs:
           git checkout -B data-branch-v2
           
           # Add and commit changes
-          git add public/data/
+          git add --force public/data/
           git diff --quiet && git diff --staged --quiet || git commit -m "Update portfolio data [skip ci]"
           
           # Force push to the data branch
