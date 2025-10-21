@@ -17,6 +17,8 @@ export interface CuratedProject extends Project {
   license: LicenseData | null;
   stats: RepoStats;
   platform: PlatformInfo;
+  writtenAt?: string;        // ISO 8601 date when the blog post was written
+  updatedAt?: string;        // ISO 8601 date when the blog post was last updated
 }
 
 // All Projects (includes non-curated repos)
@@ -31,6 +33,8 @@ export interface AllProject extends Project {
   hasWiki: boolean;
   hasPages: boolean;
   content?: string; // Only present for curated projects
+  writtenAt?: string;        // ISO 8601 date when the blog post was written (curated only)
+  updatedAt?: string;        // ISO 8601 date when the blog post was last updated (curated only)
 }
 
 // Repository Statistics
@@ -77,6 +81,8 @@ export interface MarkdownFrontmatter {
   role: string;
   technologies: string[];
   status: string;
+  writtenAt?: string;        // ISO 8601 date when the blog post was written
+  updatedAt?: string;        // ISO 8601 date when the blog post was last updated
 }
 
 // Parsed Markdown

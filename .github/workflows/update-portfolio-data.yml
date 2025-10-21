@@ -1,9 +1,12 @@
 name: Update Portfolio Data
 
 on:
-  schedule:
-    - cron: '0 */12 * * *'  # Run every 12 hours
   workflow_dispatch:  # Allow manual trigger
+  push:
+    branches: [main, master]  # Run on pushes to main/master
+  pull_request:
+    branches: [main, master]  # Run on PR merges to main/master
+    types: [closed]
 
 jobs:
   update-portfolio-data:

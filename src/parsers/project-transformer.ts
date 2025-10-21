@@ -134,7 +134,9 @@ export function transformToAllProject(
     technologies: markdown.frontmatter.technologies.slice(0, 5),
     status: markdown.frontmatter.status,
     liveUrl: markdown.frontmatter.liveUrl,
-    content: markdown.content // Include content for curated projects
+    content: markdown.content, // Include content for curated projects
+    writtenAt: markdown.frontmatter.writtenAt,
+    updatedAt: markdown.frontmatter.updatedAt
   } : {
     title: defaults.title,
     description: defaults.description,
@@ -201,6 +203,8 @@ export function transformToCuratedProject(
     readme,
     license,
     stats: stats || defaultStats,
-    platform
+    platform,
+    writtenAt: markdown.frontmatter.writtenAt,
+    updatedAt: markdown.frontmatter.updatedAt
   };
 }
