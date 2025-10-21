@@ -5,6 +5,8 @@ liveUrl: "https://joinsyrup.com/"
 role: "Maintainer"
 technologies: [ "Go", "PostgreSQL", "Redis", "JavaScript" ]
 status: "Active"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->

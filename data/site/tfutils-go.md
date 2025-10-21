@@ -4,6 +4,8 @@ repoUrl: "https://github.com/ImGajeed76/tfutils-go"
 role: "Creator"
 technologies: [ "Go", "CLI", "Charmer", "Bubble Tea" ]
 status: "Active"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->

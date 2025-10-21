@@ -5,6 +5,8 @@ liveUrl: "https://axonotes.github.io/axogen/"
 role: "Creator"
 technologies: [ "TypeScript", "Zod", "Node.js", "Nunjucks", "Handlebars", "Mustache" ]
 status: "Active"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->

@@ -5,6 +5,8 @@ liveUrl: "https://bfscript.streamlit.app/"
 role: "Creator"
 technologies: [ "Python", "Lark", "Compiler Design" ]
 status: "Active"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->

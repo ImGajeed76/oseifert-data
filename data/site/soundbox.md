@@ -4,6 +4,8 @@ repoUrl: ""
 role: "Embedded Systems Developer"
 technologies: [ "STM32", "C", "FreeRTOS", "SPI", "UART", "I2C", "DAC", "DMA", "STM32CubeMX", "CLion" ]
 status: "Completed"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->

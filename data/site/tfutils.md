@@ -5,6 +5,8 @@ liveUrl: "https://imgajeed76.github.io/tfUtils/"
 role: "Developer"
 technologies: [ "Python", "Textual", "Go", "MkDocs" ]
 status: "Active"
+writtenAt: "2025-10-21T00:00:00.000Z"
+updatedAt: "2025-10-21T00:00:00.000Z"
 ---
 
 <!-- description -->
