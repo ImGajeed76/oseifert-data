@@ -38,13 +38,6 @@ export function deriveRole(
 	return 'Contributor';
 }
 
-/** Format repo name into a readable title */
-export function formatTitle(repoName: string): string {
-	return repoName
-		.replace(/[-_]/g, ' ')
-		.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 /** Convert raw byte counts to Language[] with percentages and colors */
 export function processLanguages(
 	rawLangs: Record<string, number>,

@@ -32,10 +32,11 @@ async function fetchArticleBody(id: number): Promise<string> {
 export async function fetchDevToArticles(username: string): Promise<BlogPost[]> {
 	const articles: DevToArticle[] = [];
 	let page = 1;
+	const MAX_PAGES = 50;
 
-	while (true) {
+	while (page <= MAX_PAGES) {
 		const res = await fetch(
-			`https://dev.to/api/articles?username=${username.toLowerCase()}&per_page=100&page=${page}`
+			`https://dev.to/api/articles?username=${encodeURIComponent(username.toLowerCase())}&per_page=100&page=${page}`
 		);
 		if (!res.ok) {
 			console.warn(`dev.to API returned ${res.status}`);

@@ -3,7 +3,7 @@ import { join, resolve } from 'node:path';
 import { GitHubClient } from './platforms/github.ts';
 import { GitLabClient } from './platforms/gitlab.ts';
 import { GiteaClient } from './platforms/gitea.ts';
-import { deriveRole, formatTitle, processLanguages, generateSlug } from './platforms/base.ts';
+import { deriveRole, processLanguages, generateSlug } from './platforms/base.ts';
 import type { PlatformClient } from './platforms/base.ts';
 import { getLanguageColor } from './utils/colors.ts';
 import { loadBlogPosts } from './blog-parser.ts';
@@ -58,11 +58,16 @@ async function fetchAllRepos(clients: PlatformClient[]): Promise<RepoWithPlatfor
 
 	for (const client of clients) {
 		console.log(`Fetching repos from ${client.platform} (${client.username})...`);
-		const repos = await client.fetchRepos();
-		console.log(`  Found ${repos.length} public repos`);
+		try {
+			const repos = await client.fetchRepos();
+			console.log(`  Found ${repos.length} public repos`);
 
-		for (const repo of repos) {
-			allRepos.push({ ...repo, _platform: client.platform, _client: client });
+			for (const repo of repos) {
+				allRepos.push({ ...repo, _platform: client.platform, _client: client });
+			}
+		} catch (err) {
+			console.error(`  ERROR: Failed to fetch from ${client.platform} (${client.username}):`, err);
+			console.error(`  Skipping this platform and continuing...`);
 		}
 	}
 
@@ -97,7 +102,7 @@ async function enrichRepo(
 
 	return {
 		slug,
-		title: formatTitle(repo.name),
+		title: repo.name,
 		description: repo.description || '',
 		url: repo.html_url,
 		homepage: repo.homepage || null,
@@ -187,9 +192,12 @@ async function main() {
 			})
 		);
 		projects.push(...enriched);
-		process.stdout.write(`  ${Math.min(i + BATCH_SIZE, allRepos.length)}/${allRepos.length}\r`);
+		const progress = `  ${Math.min(i + BATCH_SIZE, allRepos.length)}/${allRepos.length}`;
+		if (process.stdout.isTTY) {
+			process.stdout.write(`${progress}\r`);
+		}
 	}
-	console.log('');
+	if (process.stdout.isTTY) console.log('');
 
 	// 7. Filter out projects without a README
 	const projectsWithReadme = projects.filter((p) => p.readme.trim().length > 0);

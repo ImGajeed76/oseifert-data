@@ -15,9 +15,17 @@ interface BlogFrontmatter {
 	externalUrl?: string;
 }
 
+/** Normalize a YAML date value to an ISO date string (YYYY-MM-DD) */
+function normalizeDate(value: unknown): string {
+	if (value instanceof Date) return value.toISOString().split('T')[0];
+	return String(value);
+}
+
 /** Parse a single markdown file into a BlogPost */
 function parseBlogFile(raw: string, filename: string): BlogPost {
-	const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+	// Normalize CRLF to LF before parsing
+	const normalized = raw.replace(/\r\n/g, '\n');
+	const fmMatch = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 	if (!fmMatch) {
 		throw new Error(`Invalid frontmatter in ${filename}`);
 	}
@@ -36,8 +44,8 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 		slug: frontmatter.slug,
 		title: frontmatter.title,
 		excerpt: frontmatter.excerpt || '',
-		date: frontmatter.date,
-		updated: frontmatter.updated || null,
+		date: normalizeDate(frontmatter.date),
+		updated: frontmatter.updated ? normalizeDate(frontmatter.updated) : null,
 		tags: frontmatter.tags || [],
 		projects: frontmatter.projects || [],
 		content,

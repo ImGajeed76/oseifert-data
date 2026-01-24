@@ -16,11 +16,15 @@ export class GiteaClient implements PlatformClient {
 
 	private async apiFetch<T>(path: string): Promise<T | null> {
 		const url = `${this.baseUrl}/api/v1${path}`;
-		const res = await fetch(url, {
-			headers: { 'Authorization': `token ${this.token}` },
-		});
-		if (!res.ok) return null;
-		return res.json() as Promise<T>;
+		try {
+			const res = await fetch(url, {
+				headers: { 'Authorization': `token ${this.token}` },
+			});
+			if (!res.ok) return null;
+			return (await res.json()) as T;
+		} catch {
+			return null;
+		}
 	}
 
 	async fetchPermission(_owner: string, _repo: string): Promise<string> {
@@ -31,8 +35,9 @@ export class GiteaClient implements PlatformClient {
 	async fetchRepos(): Promise<RawRepo[]> {
 		const repos: RawRepo[] = [];
 		let page = 1;
+		const MAX_PAGES = 50;
 
-		while (true) {
+		while (page <= MAX_PAGES) {
 			const data = await this.apiFetch<any[]>(
 				`/users/${this.username}/repos?limit=50&page=${page}`
 			);
@@ -80,22 +85,25 @@ export class GiteaClient implements PlatformClient {
 	}
 
 	async fetchReadme(owner: string, repo: string): Promise<string> {
-		const data = await this.apiFetch<{ content?: string; download_url?: string }>(
-			`/repos/${owner}/${repo}/raw/README.md`
+		// Use /contents/ endpoint which returns JSON with base64-encoded content
+		const data = await this.apiFetch<{ content?: string; encoding?: string }>(
+			`/repos/${owner}/${repo}/contents/README.md`
 		);
-
-		if (typeof data === 'string') return data;
 
 		if (data?.content) {
 			return Buffer.from(data.content, 'base64').toString('utf-8');
 		}
 
-		// Try fetching raw
-		try {
-			const url = `${this.baseUrl}/${owner}/${repo}/raw/branch/main/README.md`;
-			const res = await fetch(url);
-			if (res.ok) return await res.text();
-		} catch { /* ignore */ }
+		// Fallback: try fetching raw from both main and master branches
+		for (const branch of ['main', 'master']) {
+			try {
+				const url = `${this.baseUrl}/${owner}/${repo}/raw/branch/${branch}/README.md`;
+				const res = await fetch(url, {
+					headers: { 'Authorization': `token ${this.token}` },
+				});
+				if (res.ok) return await res.text();
+			} catch { /* ignore */ }
+		}
 
 		return '';
 	}

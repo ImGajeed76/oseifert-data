@@ -15,8 +15,9 @@ export class GitHubClient implements PlatformClient {
 	async fetchRepos(): Promise<RawRepo[]> {
 		const repos: RawRepo[] = [];
 		let page = 1;
+		const MAX_PAGES = 50;
 
-		while (true) {
+		while (page <= MAX_PAGES) {
 			const { data } = await this.octokit.repos.listForAuthenticatedUser({
 				affiliation: 'owner,collaborator,organization_member',
 				per_page: 100,

@@ -62,9 +62,3 @@ export interface RawRepo {
 	fork: boolean;
 }
 
-export interface PlatformConfig {
-	type: 'github' | 'gitlab' | 'gitea' | 'codeberg';
-	token: string;
-	username: string;
-	baseUrl?: string;
-}

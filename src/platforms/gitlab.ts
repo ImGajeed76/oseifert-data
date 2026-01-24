@@ -15,11 +15,15 @@ export class GitLabClient implements PlatformClient {
 
 	private async apiFetch<T>(path: string): Promise<T | null> {
 		const url = `${this.baseUrl}/api/v4${path}`;
-		const res = await fetch(url, {
-			headers: { 'PRIVATE-TOKEN': this.token },
-		});
-		if (!res.ok) return null;
-		return res.json() as Promise<T>;
+		try {
+			const res = await fetch(url, {
+				headers: { 'PRIVATE-TOKEN': this.token },
+			});
+			if (!res.ok) return null;
+			return (await res.json()) as T;
+		} catch {
+			return null;
+		}
 	}
 
 	async fetchPermission(_owner: string, _repo: string): Promise<string> {
@@ -30,8 +34,9 @@ export class GitLabClient implements PlatformClient {
 	async fetchRepos(): Promise<RawRepo[]> {
 		const repos: RawRepo[] = [];
 		let page = 1;
+		const MAX_PAGES = 50;
 
-		while (true) {
+		while (page <= MAX_PAGES) {
 			const data = await this.apiFetch<any[]>(
 				`/users/${this.username}/projects?per_page=100&page=${page}&visibility=public`
 			);
