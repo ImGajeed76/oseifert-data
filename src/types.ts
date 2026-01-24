@@ -55,7 +55,7 @@ export interface RawRepo {
 	created_at: string;
 	pushed_at: string;
 	topics: string[];
-	owner: { login: string };
+	owner: { login: string; type?: string };
 	permissions?: { admin: boolean; maintain?: boolean; push: boolean; pull: boolean };
 	private: boolean;
 	archived: boolean;

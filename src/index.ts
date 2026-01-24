@@ -73,13 +73,14 @@ async function enrichRepo(
 	slug: string,
 	blogPosts: BlogPost[]
 ): Promise<Project> {
-	const [rawLangs, readme] = await Promise.all([
+	const [rawLangs, readme, roleName] = await Promise.all([
 		repo._client.fetchLanguages(repo.owner.login, repo.name),
 		repo._client.fetchReadme(repo.owner.login, repo.name),
+		repo._client.fetchPermission(repo.owner.login, repo.name),
 	]);
 
 	const languages = processLanguages(rawLangs, getLanguageColor);
-	const role = deriveRole(repo.owner.login, repo._client.username, repo.permissions);
+	const role = deriveRole(repo.owner.login, repo.owner.type, repo._client.username, roleName);
 
 	// Cross-reference: blog posts reference projects by slug
 	const linkedBlogPosts = blogPosts
@@ -171,17 +172,21 @@ async function main() {
 	}
 	console.log('');
 
-	// 7. Sort projects by stars descending (consistent output order)
-	projects.sort((a, b) => b.stars - a.stars);
+	// 7. Filter out projects without a README
+	const projectsWithReadme = projects.filter((p) => p.readme.trim().length > 0);
+	console.log(`Filtered: ${projects.length - projectsWithReadme.length} repos without README removed`);
 
-	// 8. Write output
+	// 8. Sort projects by stars descending (consistent output order)
+	projectsWithReadme.sort((a, b) => b.stars - a.stars);
+
+	// 9. Write output
 	await mkdir(OUTPUT_DIR, { recursive: true });
 
 	await writeFile(
 		join(OUTPUT_DIR, 'projects.json'),
-		JSON.stringify(projects, null, 2)
+		JSON.stringify(projectsWithReadme, null, 2)
 	);
-	console.log(`Wrote ${projects.length} projects to projects.json`);
+	console.log(`Wrote ${projectsWithReadme.length} projects to projects.json`);
 
 	// Filter drafts out of blog output
 	const publishedPosts = blogPosts.filter((p) => !p.draft);

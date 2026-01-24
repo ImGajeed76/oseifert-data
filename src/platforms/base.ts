@@ -1,8 +1,11 @@
 import type { RawRepo, Language } from '../types.ts';
 
 export interface PlatformClient {
-	/** Fetch all repos accessible to the authenticated user (owned + collaborator) */
+	/** Fetch all repos accessible to the authenticated user (owned + collaborator + org) */
 	fetchRepos(): Promise<RawRepo[]>;
+
+	/** Fetch the user's actual role on a repo (admin, maintain, write, triage, read) */
+	fetchPermission(owner: string, repo: string): Promise<string>;
 
 	/** Fetch language breakdown for a repo */
 	fetchLanguages(owner: string, repo: string): Promise<Record<string, number>>;
@@ -17,14 +20,21 @@ export interface PlatformClient {
 	readonly platform: string;
 }
 
-/** Derive role from repo owner and permissions */
+/** Derive role from repo owner, owner type, and the actual role_name from the API */
 export function deriveRole(
 	repoOwner: string,
+	ownerType: string | undefined,
 	authenticatedUser: string,
-	permissions?: { admin: boolean; maintain?: boolean; push: boolean }
+	roleName: string
 ): 'Creator' | 'Maintainer' | 'Contributor' {
+	// Personal repo owned by the user
 	if (repoOwner === authenticatedUser) return 'Creator';
-	if (permissions?.admin || permissions?.maintain) return 'Maintainer';
+	// Org repo where the user has admin (org owner/admin)
+	if (ownerType === 'Organization' && roleName === 'admin') return 'Creator';
+	// Admin, maintain, or write access on someone else's repo = Maintainer
+	// (write = direct push access, beyond typical contributor who only PRs)
+	if (roleName === 'admin' || roleName === 'maintain' || roleName === 'write') return 'Maintainer';
+	// Everything else (triage, read)
 	return 'Contributor';
 }
 

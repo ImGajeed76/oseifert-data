@@ -18,7 +18,7 @@ export class GitHubClient implements PlatformClient {
 
 		while (true) {
 			const { data } = await this.octokit.repos.listForAuthenticatedUser({
-				affiliation: 'owner,collaborator',
+				affiliation: 'owner,collaborator,organization_member',
 				per_page: 100,
 				page,
 				sort: 'pushed',
@@ -42,7 +42,7 @@ export class GitHubClient implements PlatformClient {
 					created_at: repo.created_at || '',
 					pushed_at: repo.pushed_at || '',
 					topics: repo.topics || [],
-					owner: { login: repo.owner.login },
+					owner: { login: repo.owner.login, type: repo.owner.type },
 					permissions: repo.permissions ? {
 						admin: repo.permissions.admin || false,
 						maintain: repo.permissions.maintain,
@@ -59,6 +59,19 @@ export class GitHubClient implements PlatformClient {
 		}
 
 		return repos;
+	}
+
+	async fetchPermission(owner: string, repo: string): Promise<string> {
+		try {
+			const { data } = await this.octokit.repos.getCollaboratorPermissionLevel({
+				owner,
+				repo,
+				username: this.username,
+			});
+			return data.role_name || data.permission || '';
+		} catch {
+			return '';
+		}
 	}
 
 	async fetchLanguages(owner: string, repo: string): Promise<Record<string, number>> {

@@ -23,6 +23,11 @@ export class GiteaClient implements PlatformClient {
 		return res.json() as Promise<T>;
 	}
 
+	async fetchPermission(_owner: string, _repo: string): Promise<string> {
+		// Gitea: if we fetched it, we're at minimum a member. Assume admin for own repos.
+		return 'admin';
+	}
+
 	async fetchRepos(): Promise<RawRepo[]> {
 		const repos: RawRepo[] = [];
 		let page = 1;
