@@ -2720,9 +2720,9 @@ const languageColors: Record<string, {
 	}
 }
 
-export function getLanguageColor(language: string): string | null | undefined {
-	language = language.toLowerCase();
-	if (language in languageColors) {
-		return languageColors[language].color;
-	}
+const DEFAULT_COLOR = '#8b949e';
+
+export function getLanguageColor(language: string): string {
+	const entry = languageColors[language.toLowerCase()];
+	return entry?.color || DEFAULT_COLOR;
 }

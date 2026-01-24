@@ -1,22 +1,12 @@
 ---
-title: "BFScript"
-repoUrl: "https://github.com/ImGajeed76/bfscript"
-liveUrl: "https://bfscript.streamlit.app/"
-role: "Creator"
-technologies: [ "Python", "Lark", "Compiler Design" ]
-status: "Active"
-writtenAt: "2025-10-21T00:00:00.000Z"
-updatedAt: "2025-10-21T00:00:00.000Z"
+title: "BFScript: Bridging the Gap Between Readability and Brainfuck"
+slug: building-bfscript
+date: "2025-10-21"
+tags: [python, compilers, language-design, brainfuck, lark]
+projects: [bfscript]
+excerpt: "A deep dive into building a compiler that translates C-like syntax into Brainfuck — exploring parser design, memory management on a tape machine, and the creative solutions needed when your target has only 8 instructions."
+draft: false
 ---
-
-<!-- description -->
-BFScript is a compiler written in Python that translates a familiar, C-inspired syntax into notoriously minimalistic
-Brainfuck code. It aims to make developing complex Brainfuck programs more feasible by providing higher-level
-abstractions.
-<!-- /description -->
-
-<!-- content -->
-# BFScript: Bridging the Gap Between Readability and Brainfuck
 
 ## The Idea: What It Is and Why I Built It
 
@@ -291,5 +281,3 @@ a learning tool.
   code (making it shorter or faster—there's definitely redundant `+-<>` sequences I could collapse). The idea of using
   LLVM Intermediate Representation (IR) as a source, allowing potentially *any* language that compiles to LLVM to be
   compiled to Brainfuck, is also an interesting, though very ambitious, future thought experiment.
-
-<!-- /content -->
