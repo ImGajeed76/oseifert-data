@@ -83,9 +83,16 @@ async function enrichRepo(
 	const languages = processLanguages(rawLangs, getLanguageColor);
 	const role = deriveRole(repo.owner.login, repo.owner.type, repo._client.username, roleName);
 
-	// Cross-reference: blog posts reference projects by slug
+	// Cross-reference: explicit (frontmatter projects field) + auto (scan content for repo URLs)
+	const repoUrl = repo.html_url.toLowerCase();
 	const linkedBlogPosts = blogPosts
-		.filter((post) => post.projects.includes(slug))
+		.filter((post) => {
+			// Explicit: declared in frontmatter
+			if (post.projects.includes(slug)) return true;
+			// Auto: scan content for GitHub repo URL
+			if (post.content && post.content.toLowerCase().includes(repoUrl)) return true;
+			return false;
+		})
 		.map((post) => post.slug);
 
 	return {

@@ -12,6 +12,22 @@ interface DevToArticle {
 	reading_time_minutes: number;
 }
 
+interface DevToArticleFull extends DevToArticle {
+	body_markdown: string;
+}
+
+/** Fetch a single article's full body */
+async function fetchArticleBody(id: number): Promise<string> {
+	try {
+		const res = await fetch(`https://dev.to/api/articles/${id}`);
+		if (!res.ok) return '';
+		const data = (await res.json()) as DevToArticleFull;
+		return data.body_markdown || '';
+	} catch {
+		return '';
+	}
+}
+
 /** Fetch all published articles from dev.to for a given username */
 export async function fetchDevToArticles(username: string): Promise<BlogPost[]> {
 	const articles: DevToArticle[] = [];
@@ -32,17 +48,24 @@ export async function fetchDevToArticles(username: string): Promise<BlogPost[]> 
 		page++;
 	}
 
-	return articles.map((article) => ({
-		slug: `devto-${article.slug}`,
-		title: article.title,
-		excerpt: article.description || '',
-		date: article.published_at.split('T')[0],
-		updated: article.edited_at ? article.edited_at.split('T')[0] : null,
-		tags: article.tag_list || [],
-		projects: [],
-		content: '',
-		draft: false,
-		readingTime: article.reading_time_minutes,
-		externalUrl: article.url,
-	}));
+	// Fetch full body for each article (needed for link scanning)
+	const posts: BlogPost[] = [];
+	for (const article of articles) {
+		const body = await fetchArticleBody(article.id);
+		posts.push({
+			slug: `devto-${article.slug}`,
+			title: article.title,
+			excerpt: article.description || '',
+			date: article.published_at.split('T')[0],
+			updated: article.edited_at ? article.edited_at.split('T')[0] : null,
+			tags: article.tag_list || [],
+			projects: [],
+			content: body,
+			draft: false,
+			readingTime: article.reading_time_minutes,
+			externalUrl: article.url,
+		});
+	}
+
+	return posts;
 }
