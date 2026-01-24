@@ -7,6 +7,7 @@ import { deriveRole, formatTitle, processLanguages, generateSlug } from './platf
 import type { PlatformClient } from './platforms/base.ts';
 import { getLanguageColor } from './utils/colors.ts';
 import { loadBlogPosts } from './blog-parser.ts';
+import { fetchDevToArticles } from './devto.ts';
 import type { Project, BlogPost, RawRepo } from './types.ts';
 
 const ROOT_DIR = resolve(import.meta.dirname, '..');
@@ -118,10 +119,21 @@ async function main() {
 		process.exit(1);
 	}
 
-	// 2. Load blog posts
+	// 2. Load blog posts (local markdown + dev.to)
 	console.log('Loading blog posts...');
-	const blogPosts = await loadBlogPosts(BLOG_DIR);
-	console.log(`  Found ${blogPosts.length} blog posts\n`);
+	const localPosts = await loadBlogPosts(BLOG_DIR);
+	console.log(`  Found ${localPosts.length} local blog posts`);
+
+	const devtoUsername = process.env.DEVTO_USERNAME || process.env.GH_USERNAME;
+	let devtoPosts: BlogPost[] = [];
+	if (devtoUsername) {
+		console.log(`  Fetching dev.to articles for ${devtoUsername}...`);
+		devtoPosts = await fetchDevToArticles(devtoUsername);
+		console.log(`  Found ${devtoPosts.length} dev.to articles`);
+	}
+
+	const blogPosts = [...localPosts, ...devtoPosts];
+	console.log(`  Total: ${blogPosts.length} blog posts\n`);
 
 	// 3. Fetch all repos from all platforms
 	const allRepos = await fetchAllRepos(clients);
