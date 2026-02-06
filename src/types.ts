@@ -18,6 +18,7 @@ export interface Project {
 	role: 'Creator' | 'Maintainer' | 'Contributor';
 	readme: string;
 	linkedBlogPosts: string[];
+	pinned: boolean;
 }
 
 export interface Language {

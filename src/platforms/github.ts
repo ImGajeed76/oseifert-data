@@ -6,10 +6,43 @@ export class GitHubClient implements PlatformClient {
 	private octokit: Octokit;
 	readonly username: string;
 	readonly platform = 'github';
+	private pinnedRepoNames: Set<string> | null = null;
 
 	constructor(token: string, username: string) {
 		this.octokit = new Octokit({ auth: token });
 		this.username = username;
+	}
+
+	async fetchPinnedRepos(): Promise<Set<string>> {
+		if (this.pinnedRepoNames !== null) {
+			return this.pinnedRepoNames;
+		}
+
+		try {
+			const query = `
+				query($username: String!) {
+					user(login: $username) {
+						pinnedItems(first: 6, types: REPOSITORY) {
+							nodes {
+								... on Repository {
+									nameWithOwner
+								}
+							}
+						}
+					}
+				}
+			`;
+
+			const response: any = await this.octokit.graphql(query, { username: this.username });
+			const nodes = response?.user?.pinnedItems?.nodes || [];
+			// Use full name (owner/repo) to avoid collisions
+			this.pinnedRepoNames = new Set(nodes.map((n: any) => n.nameWithOwner));
+		} catch (err) {
+			console.error('  Warning: Failed to fetch pinned repos:', err);
+			this.pinnedRepoNames = new Set();
+		}
+
+		return this.pinnedRepoNames;
 	}
 
 	async fetchRepos(): Promise<RawRepo[]> {

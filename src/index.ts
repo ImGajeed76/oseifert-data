@@ -3,8 +3,7 @@ import { join, resolve } from 'node:path';
 import { GitHubClient } from './platforms/github.ts';
 import { GitLabClient } from './platforms/gitlab.ts';
 import { GiteaClient } from './platforms/gitea.ts';
-import { deriveRole, processLanguages, generateSlug } from './platforms/base.ts';
-import type { PlatformClient } from './platforms/base.ts';
+import { deriveRole, processLanguages, generateSlug, type PlatformClient } from './platforms/base.ts';
 import { getLanguageColor } from './utils/colors.ts';
 import { loadBlogPosts } from './blog-parser.ts';
 import { fetchDevToArticles } from './devto.ts';
@@ -77,7 +76,8 @@ async function fetchAllRepos(clients: PlatformClient[]): Promise<RepoWithPlatfor
 async function enrichRepo(
 	repo: RepoWithPlatform,
 	slug: string,
-	blogPosts: BlogPost[]
+	blogPosts: BlogPost[],
+	pinnedRepoNames: Set<string>
 ): Promise<Project> {
 	const [rawLangs, readme, roleName] = await Promise.all([
 		repo._client.fetchLanguages(repo.owner.login, repo.name),
@@ -87,6 +87,7 @@ async function enrichRepo(
 
 	const languages = processLanguages(rawLangs, getLanguageColor);
 	const role = deriveRole(repo.owner.login, repo.owner.type, repo._client.username, roleName);
+	const pinned = repo._platform === 'github' && pinnedRepoNames.has(repo.full_name);
 
 	// Cross-reference: explicit (frontmatter projects field) + auto (scan content for repo URLs)
 	const repoUrl = repo.html_url.toLowerCase();
@@ -118,6 +119,7 @@ async function enrichRepo(
 		role,
 		readme,
 		linkedBlogPosts,
+		pinned,
 	};
 }
 
@@ -178,7 +180,13 @@ async function main() {
 		process.exit(1);
 	}
 
-	// 6. Enrich repos (fetch languages + readme in parallel, batched)
+	// 6. Fetch pinned repos from GitHub
+	console.log('Fetching pinned repos from GitHub...');
+	const githubClient = clients.find((c) => c.platform === 'github') as GitHubClient | undefined;
+	const pinnedRepoNames = githubClient ? await githubClient.fetchPinnedRepos() : new Set<string>();
+	console.log(`  Found ${pinnedRepoNames.size} pinned repos`);
+
+	// 7. Enrich repos (fetch languages + readme in parallel, batched)
 	console.log('Enriching repos (languages + readme)...');
 	const BATCH_SIZE = 5;
 	const projects: Project[] = [];
@@ -188,7 +196,7 @@ async function main() {
 		const enriched = await Promise.all(
 			batch.map((repo, batchIdx) => {
 				const slug = slugs[i + batchIdx];
-				return enrichRepo(repo, slug, blogPosts);
+				return enrichRepo(repo, slug, blogPosts, pinnedRepoNames);
 			})
 		);
 		projects.push(...enriched);
@@ -199,14 +207,17 @@ async function main() {
 	}
 	if (process.stdout.isTTY) console.log('');
 
-	// 7. Filter out projects without a README
-	const projectsWithReadme = projects.filter((p) => p.readme.trim().length > 0);
-	console.log(`Filtered: ${projects.length - projectsWithReadme.length} repos without README removed`);
+	// 8. Filter out projects without a README and exclude this data repo itself
+	const EXCLUDED_REPOS = ['oseifert-data'];
+	const projectsWithReadme = projects.filter((p) => 
+		p.readme.trim().length > 0 && !EXCLUDED_REPOS.includes(p.title)
+	);
+	console.log(`Filtered: ${projects.length - projectsWithReadme.length} repos removed (no README or excluded)`);
 
-	// 8. Sort projects by stars descending (consistent output order)
+	// 9. Sort projects by stars descending (consistent output order)
 	projectsWithReadme.sort((a, b) => b.stars - a.stars);
 
-	// 9. Write output
+	// 10. Write output
 	await mkdir(OUTPUT_DIR, { recursive: true });
 
 	await writeFile(
