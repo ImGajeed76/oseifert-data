@@ -8,6 +8,7 @@ import { getLanguageColor } from './utils/colors.ts';
 import { loadBlogPosts } from './blog-parser.ts';
 import { fetchDevToArticles } from './devto.ts';
 import type { Project, BlogPost, RawRepo } from './types.ts';
+import { generateDiscovery } from './discovery.ts';
 
 const ROOT_DIR = resolve(import.meta.dirname, '..');
 const BLOG_DIR = join(ROOT_DIR, 'data', 'blog');
@@ -233,6 +234,15 @@ async function main() {
 		JSON.stringify(publishedPosts, null, 2)
 	);
 	console.log(`Wrote ${publishedPosts.length} blog posts to blog-posts.json (${blogPosts.length - publishedPosts.length} drafts excluded)`);
+
+	// 11. Generate discovery map (TF-IDF dissimilarity)
+	console.log('Generating discovery map...');
+	const discovery = generateDiscovery(projectsWithReadme, publishedPosts);
+	await writeFile(
+		join(OUTPUT_DIR, 'discovery.json'),
+		JSON.stringify(discovery)
+	);
+	console.log(`Wrote discovery.json`);
 
 	console.log('\nDone!');
 }
