@@ -1,5 +1,5 @@
 ---
-title: "BFScript: Bridging the Gap Between Readability and Brainfuck"
+title: "BFScript: A C-Like Compiler for Brainfuck"
 slug: building-bfscript
 date: "2025-10-21"
 tags: [python, compilers, language-design, brainfuck, lark]

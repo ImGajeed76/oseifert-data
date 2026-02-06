@@ -1,5 +1,5 @@
 ---
-title: "Charmer: Turning Go Functions into Interactive TUIs"
+title: "Charmer: Generate TUIs from Annotated Go Functions with Bubble Tea"
 slug: building-charmer
 date: "2025-10-21"
 tags: [go, tui, charm, bubble-tea, code-generation]

@@ -1,5 +1,5 @@
 ---
-title: "Bergpreis Soundbox: Engineering a Better Game Experience"
+title: "STM32 Audio Playback with FreeRTOS: Building the Bergpreis Soundbox"
 slug: bergpreis-soundbox
 date: "2025-10-21"
 tags: [embedded, stm32, c, freertos, hardware, audio]
