@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { parse as parseYaml } from 'yaml';
 import type { BlogPost } from './types.ts';
 
@@ -40,8 +41,11 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 	const wordCount = content.split(/\s+/).filter(Boolean).length;
 	const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
+	const isDraft = frontmatter.draft ?? false;
+	const slug = isDraft ? `draft-${randomUUID()}` : frontmatter.slug;
+
 	return {
-		slug: frontmatter.slug,
+		slug,
 		title: frontmatter.title,
 		excerpt: frontmatter.excerpt || '',
 		date: normalizeDate(frontmatter.date),
@@ -49,7 +53,7 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 		tags: frontmatter.tags || [],
 		projects: frontmatter.projects || [],
 		content,
-		draft: frontmatter.draft ?? false,
+		draft: isDraft,
 		readingTime,
 		externalUrl: frontmatter.externalUrl || null,
 	};

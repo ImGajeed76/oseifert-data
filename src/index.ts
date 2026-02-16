@@ -148,6 +148,13 @@ async function main() {
 	}
 
 	const blogPosts = [...localPosts, ...devtoPosts];
+	const drafts = blogPosts.filter((p) => p.draft);
+	if (drafts.length > 0) {
+		console.log(`  Drafts (preview URLs):`);
+		for (const d of drafts) {
+			console.log(`    "${d.title}" -> /blog/${d.slug}`);
+		}
+	}
 	console.log(`  Total: ${blogPosts.length} blog posts\n`);
 
 	// 3. Fetch all repos from all platforms
@@ -227,17 +234,18 @@ async function main() {
 	);
 	console.log(`Wrote ${projectsWithReadme.length} projects to projects.json`);
 
-	// Filter drafts out of blog output
-	const publishedPosts = blogPosts.filter((p) => !p.draft);
+	// Drafts are included with randomized slugs (unguessable but previewable via direct link)
+	const draftCount = blogPosts.filter((p) => p.draft).length;
 	await writeFile(
 		join(OUTPUT_DIR, 'blog-posts.json'),
-		JSON.stringify(publishedPosts, null, 2)
+		JSON.stringify(blogPosts, null, 2)
 	);
-	console.log(`Wrote ${publishedPosts.length} blog posts to blog-posts.json (${blogPosts.length - publishedPosts.length} drafts excluded)`);
+	console.log(`Wrote ${blogPosts.length} blog posts to blog-posts.json (${draftCount} drafts with randomized slugs)`);
 
-	// 11. Generate discovery map (TF-IDF dissimilarity)
+	// 11. Generate discovery map (TF-IDF dissimilarity) — exclude drafts
 	console.log('Generating discovery map...');
-	const discovery = generateDiscovery(projectsWithReadme, publishedPosts);
+	const nonDraftPosts = blogPosts.filter((p) => !p.draft);
+	const discovery = generateDiscovery(projectsWithReadme, nonDraftPosts);
 	await writeFile(
 		join(OUTPUT_DIR, 'discovery.json'),
 		JSON.stringify(discovery)
