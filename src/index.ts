@@ -152,7 +152,7 @@ async function main() {
 	if (drafts.length > 0) {
 		console.log(`  Drafts (preview URLs):`);
 		for (const d of drafts) {
-			console.log(`    "${d.title}" -> /blog/${d.slug}`);
+			console.log(`    "${d.title}" -> https://oseifert.ch/blog/${d.slug}`);
 		}
 	}
 	console.log(`  Total: ${blogPosts.length} blog posts\n`);
@@ -234,13 +234,13 @@ async function main() {
 	);
 	console.log(`Wrote ${projectsWithReadme.length} projects to projects.json`);
 
-	// Drafts are included with randomized slugs (unguessable but previewable via direct link)
+	// Drafts are included with hashed slugs (unguessable but previewable via direct link)
 	const draftCount = blogPosts.filter((p) => p.draft).length;
 	await writeFile(
 		join(OUTPUT_DIR, 'blog-posts.json'),
 		JSON.stringify(blogPosts, null, 2)
 	);
-	console.log(`Wrote ${blogPosts.length} blog posts to blog-posts.json (${draftCount} drafts with randomized slugs)`);
+	console.log(`Wrote ${blogPosts.length} blog posts to blog-posts.json (${draftCount} drafts with hashed slugs)`);
 
 	// 11. Generate discovery map (TF-IDF dissimilarity) — exclude drafts
 	console.log('Generating discovery map...');

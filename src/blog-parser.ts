@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { parse as parseYaml } from 'yaml';
 import type { BlogPost } from './types.ts';
 
@@ -14,6 +14,11 @@ interface BlogFrontmatter {
 	excerpt: string;
 	draft?: boolean;
 	externalUrl?: string;
+}
+
+/** Generate a deterministic, truncated SHA-256 hex hash of the given input */
+function hashSlug(slug: string): string {
+	return createHash('sha256').update(slug).digest('hex').slice(0, 12);
 }
 
 /** Normalize a YAML date value to an ISO date string (YYYY-MM-DD) */
@@ -42,7 +47,7 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 	const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
 	const isDraft = frontmatter.draft ?? false;
-	const slug = isDraft ? `draft-${randomUUID()}` : frontmatter.slug;
+	const slug = isDraft ? `draft-${hashSlug(frontmatter.slug)}` : frontmatter.slug;
 
 	return {
 		slug,
