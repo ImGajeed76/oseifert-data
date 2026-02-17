@@ -22,6 +22,12 @@ pgit import /path/to/your/repo --branch main
 pgit sql "SELECT p.path, COUNT(*) as versions FROM pgit_file_refs f JOIN pgit_paths p ON p.group_id = f.group_id GROUP BY p.path ORDER BY versions DESC LIMIT 5"
 ```
 
+<details>
+<summary>What does this query do?</summary>
+
+It joins each file reference to its path, counts how many versions (commits) exist per file, and returns the 5 most-modified files — your maintenance hotspots.
+</details>
+
 No scripts. No parsing `git log` output. No piping things through awk. Just SQL.
 
 Want to know which files are always changed together? That's a coupling analysis — the kind of thing that usually requires custom tooling or expensive third-party services. With pgit, it's a query:
@@ -37,6 +43,12 @@ GROUP BY pa.path, pb.path
 ORDER BY times_together DESC
 LIMIT 10;
 ```
+
+<details>
+<summary>What does this query do?</summary>
+
+It finds every pair of files that were changed in the same commit (a self-join on `commit_id`), counts how often each pair appears together, and returns the top 10. The `a.group_id < b.group_id` condition avoids counting the same pair twice.
+</details>
 
 Under the hood, pgit uses [pg-xpatch](https://github.com/ImGajeed76/pg-xpatch), a PostgreSQL Table Access Method (basically a custom storage engine) that I built on top of my [xpatch](https://github.com/ImGajeed76/xpatch) delta compression library (I wrote about building xpatch [here](https://oseifert.ch/blog/building-xpatch)). When you insert file versions, pg-xpatch automatically stores only the deltas between consecutive versions. When you SELECT, it reconstructs the full content transparently. You just write normal SQL.
 
@@ -167,7 +179,7 @@ In **9 minutes and 36 seconds**, it produced a full codebase health report. It f
 
 The agent's summary was genuinely insightful: "tenant.rs at 476 KB with 562 versions is the top candidate for decomposition." It spotted that the pageserver subsystem dominates every metric — churn, coupling, file size — and that development velocity has been accelerating, with Q1 2025 as the peak quarter (746 commits).
 
-This isn't a hypothetical use case. This is a real agent, analyzing a real repository, producing real insights, with a 3-sentence prompt. The combination of pgit's SQL interface and an agent's ability to write queries makes codebase analysis something you can just *ask for*.
+This isn't a hypothetical use case. This is a real agent, analyzing a real repository, producing real insights, with a 4-sentence prompt. The combination of pgit's SQL interface and an agent's ability to write queries makes codebase analysis something you can just *ask for*.
 
 ## What's Next
 
