@@ -129,10 +129,23 @@ What pgit does well is let you **understand** a codebase's history programmatica
 - **Coupling analysis**: which files always change together? (reveals hidden dependencies)
 - **Churn detection**: which files have the most versions? (identifies maintenance hotspots)
 - **Size trends**: how has the codebase grown over time? (tracks architectural health)
+- **Bus factor**: which files have only one contributor? (knowledge silos)
 - **Full-text search across history**: `pgit search "TODO" --path "*.rs" --all` searches every version of every file
 - **Custom analytics**: any question you can express in SQL, you can answer
 
-These are the kinds of analyses that engineering teams either build custom tooling for, pay for expensive third-party services, or — most commonly — just don't do at all because the barrier is too high. With pgit, the barrier is a SQL query.
+The most common analyses are built in — no SQL needed:
+
+```bash
+pgit analyze churn                    # most frequently modified files
+pgit analyze coupling                 # files always changed together
+pgit analyze hotspots --depth 2       # churn aggregated by directory
+pgit analyze bus-factor               # files with fewest authors
+pgit analyze activity --period month  # commit velocity over time
+```
+
+All of these support `--json` for programmatic consumption, `--path` for glob filtering, and display results in an interactive table. For anything beyond the built-ins, drop down to raw SQL with `pgit sql`.
+
+These are the kinds of analyses that engineering teams either build custom tooling for, pay for expensive third-party services, or — most commonly — just don't do at all because the barrier is too high. With pgit, the barrier is a single command — or a SQL query if you need something custom.
 
 ## pgit for Agents
 
@@ -179,7 +192,9 @@ In **9 minutes and 36 seconds**, it produced a full codebase health report. It f
 
 The agent's summary was genuinely insightful: "tenant.rs at 476 KB with 562 versions is the top candidate for decomposition." It spotted that the pageserver subsystem dominates every metric — churn, coupling, file size — and that development velocity has been accelerating, with Q1 2025 as the peak quarter (746 commits).
 
-This isn't a hypothetical use case. This is a real agent, analyzing a real repository, producing real insights, with a 4-sentence prompt. The combination of pgit's SQL interface and an agent's ability to write queries makes codebase analysis something you can just *ask for*.
+This isn't a hypothetical use case. This is a real agent, analyzing a real repository, producing real insights, with a 4-sentence prompt. And with `pgit analyze`, an agent doesn't even need to write SQL for the common cases — `pgit analyze churn --json` and `pgit analyze coupling --json` give it structured data directly. SQL is there when the agent needs to go deeper, but the built-in analyses lower the floor even further.
+
+The combination of pgit's command-line interface, SQL escape hatch, and an agent's ability to reason over structured data makes codebase analysis something you can just *ask for*.
 
 ## What's Next
 
