@@ -136,11 +136,16 @@ What pgit does well is let you **understand** a codebase's history programmatica
 The most common analyses are built in — no SQL needed:
 
 ```bash
-pgit analyze churn                    # most frequently modified files
-pgit analyze coupling                 # files always changed together
-pgit analyze hotspots --depth 2       # churn aggregated by directory
-pgit analyze bus-factor               # files with fewest authors
-pgit analyze activity --period month  # commit velocity over time
+# most frequently modified files
+pgit analyze churn
+# files always changed together
+pgit analyze coupling
+# churn aggregated by directory
+pgit analyze hotspots --depth 2
+# files with fewest authors
+pgit analyze bus-factor
+# commit velocity over time
+pgit analyze activity --period month
 ```
 
 All of these support `--json` for programmatic consumption, `--path` for glob filtering, and display results in an interactive table. For anything beyond the built-ins, drop down to raw SQL with `pgit sql`.
