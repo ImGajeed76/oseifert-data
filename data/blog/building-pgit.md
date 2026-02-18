@@ -14,23 +14,30 @@ draft: true
 
 ## What is pgit?
 
-pgit is a Git-like version control CLI where everything lives in PostgreSQL instead of the filesystem. You get the familiar workflow — init, add, commit, push, pull, diff, blame — but your repository is a database. And that means your entire commit history is SQL-queryable.
+pgit is a Git-like version control CLI where everything lives in PostgreSQL instead of the filesystem. You get the familiar workflow — init, add, commit, push, pull, diff, blame — but your repository is a database. And that means your entire commit history is queryable.
 
 ```bash
 pgit init
 pgit import /path/to/your/repo --branch main
-pgit sql "SELECT p.path, COUNT(*) as versions FROM pgit_file_refs f JOIN pgit_paths p ON p.group_id = f.group_id GROUP BY p.path ORDER BY versions DESC LIMIT 5"
+pgit analyze coupling
 ```
 
+```
+file_a                    file_b                    commits_together
+────────────────────────  ────────────────────────  ────────────────
+src/parser.rs             src/lexer.rs              127
+src/db/schema.go          src/db/migrations.go      84
+README.md                 CHANGELOG.md              63
+```
+
+No scripts. No parsing `git log` output. No piping things through awk. Just answers.
+
+The most common analyses are built in — churn, coupling, hotspots, authors, activity, bus-factor — each a single command. All support `--json` for programmatic consumption, `--raw` for piping, and display results in an interactive table with search and clipboard copy.
+
+But everything is PostgreSQL underneath. When the built-in analyses aren't enough, drop down to raw SQL:
+
 <details>
-<summary>What does this query do?</summary>
-
-It joins each file reference to its path, counts how many versions (commits) exist per file, and returns the 5 most-modified files — your maintenance hotspots.
-</details>
-
-No scripts. No parsing `git log` output. No piping things through awk. Just SQL.
-
-Want to know which files are always changed together? That's a coupling analysis — the kind of thing that usually requires custom tooling or expensive third-party services. With pgit, it's a query:
+<summary>The coupling analysis above, as raw SQL</summary>
 
 ```sql
 SELECT pa.path, pb.path, COUNT(*) as times_together
@@ -40,14 +47,28 @@ JOIN pgit_file_refs b ON a.commit_id = b.commit_id
   AND a.group_id < b.group_id
 JOIN pgit_paths pb ON pb.group_id = b.group_id
 GROUP BY pa.path, pb.path
-ORDER BY times_together DESC
-LIMIT 10;
+ORDER BY times_together DESC;
 ```
 
-<details>
-<summary>What does this query do?</summary>
+This finds every pair of files changed in the same commit, counts co-occurrences, and ranks by frequency. The `a.group_id < b.group_id` condition avoids counting the same pair twice. `pgit analyze coupling` optimizes this further — it computes pairs in memory and filters out bulk reformats (commits touching 100+ files) that produce noise, not signal.
 
-It finds every pair of files that were changed in the same commit (a self-join on `commit_id`), counts how often each pair appears together, and returns the top 10. The `a.group_id < b.group_id` condition avoids counting the same pair twice.
+</details>
+
+Want to know your maintenance hotspots? That's `pgit analyze churn`. Or as SQL:
+
+<details>
+<summary>Churn analysis as raw SQL</summary>
+
+```sql
+SELECT p.path, COUNT(*) as versions
+FROM pgit_file_refs r
+JOIN pgit_paths p ON p.group_id = r.group_id
+GROUP BY p.path
+ORDER BY versions DESC;
+```
+
+Counts how many versions (commits) exist per file and returns the most-modified files. This is exactly what `pgit analyze churn` runs under the hood.
+
 </details>
 
 Under the hood, pgit uses [pg-xpatch](https://github.com/ImGajeed76/pg-xpatch), a PostgreSQL Table Access Method (basically a custom storage engine) that I built on top of my [xpatch](https://github.com/ImGajeed76/xpatch) delta compression library (I wrote about building xpatch [here](https://oseifert.ch/blog/building-xpatch)). When you insert file versions, pg-xpatch automatically stores only the deltas between consecutive versions. When you SELECT, it reconstructs the full content transparently. You just write normal SQL.
