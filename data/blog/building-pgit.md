@@ -4,11 +4,11 @@ slug: building-pgit
 date: "2026-02-16"
 tags: [postgresql, git, compression, delta-encoding, go, open-source, ai-agents]
 projects: []
-excerpt: "I built a Git-like CLI backed by PostgreSQL with delta compression. It goes head-to-head with git gc --aggressive on storage while making your entire commit history SQL-queryable. Tested on 19 real repos, 193k commits."
+excerpt: "I built a Git-like CLI backed by PostgreSQL with delta compression. Benchmarked on 20 real repos totaling 274k commits, it outcompresses git gc --aggressive on 12 out of 20 repositories while making your entire commit history SQL-queryable."
 draft: true
 ---
 
-**TL;DR:** Built a Git-like CLI backed by PostgreSQL with automatic delta compression. Import any git repo, query its entire history with SQL. Benchmarked on 19 real repositories (193k commits): pgit goes head-to-head with `git gc --aggressive` on compression (9 wins, 9 losses, 1 tie), while giving you full SQL access to every commit, file version, and change pattern. Then I gave an AI agent a single prompt and it produced a full codebase health report on Neon's own repo in under 10 minutes.
+**TL;DR:** Built a Git-like CLI backed by PostgreSQL with automatic delta compression. Import any git repo, query its entire history with SQL. Benchmarked on 20 real repositories (273,703 commits): pgit outcompresses `git gc --aggressive` on 12 out of 20 repositories, while giving you full SQL access to every commit, file version, and change pattern. Then I gave an AI agent a single prompt and it produced a full codebase health report on Neon's own repo in under 10 minutes.
 
 ---
 
@@ -42,15 +42,15 @@ But everything is PostgreSQL underneath. When the built-in analyses aren't enoug
 ```sql
 SELECT pa.path, pb.path, COUNT(*) as times_together
 FROM pgit_file_refs a
-JOIN pgit_paths pa ON pa.group_id = a.group_id
+JOIN pgit_paths pa ON pa.path_id = a.path_id
 JOIN pgit_file_refs b ON a.commit_id = b.commit_id
-  AND a.group_id < b.group_id
-JOIN pgit_paths pb ON pb.group_id = b.group_id
+  AND a.path_id < b.path_id
+JOIN pgit_paths pb ON pb.path_id = b.path_id
 GROUP BY pa.path, pb.path
 ORDER BY times_together DESC;
 ```
 
-This finds every pair of files changed in the same commit, counts co-occurrences, and ranks by frequency. The `a.group_id < b.group_id` condition avoids counting the same pair twice. `pgit analyze coupling` optimizes this further: it computes pairs in memory and filters out bulk reformats (commits touching 100+ files) that produce noise, not signal.
+This finds every pair of files changed in the same commit, counts co-occurrences, and ranks by frequency. The `a.path_id < b.path_id` condition avoids counting the same pair twice. `pgit analyze coupling` optimizes this further: it computes pairs in memory and filters out bulk reformats (commits touching 100+ files) that produce noise, not signal.
 
 </details>
 
@@ -62,7 +62,7 @@ Want to know your maintenance hotspots? That's `pgit analyze churn`. Or as SQL:
 ```sql
 SELECT p.path, COUNT(*) as versions
 FROM pgit_file_refs r
-JOIN pgit_paths p ON p.group_id = r.group_id
+JOIN pgit_paths p ON p.path_id = r.path_id
 GROUP BY p.path
 ORDER BY versions DESC;
 ```
@@ -87,47 +87,48 @@ And at some point the benchmark tool became the actual project. That became pgit
 
 ## Benchmarks: git vs pgit
 
-Here's where it gets interesting. I benchmarked pgit against git on 19 real repositories across 6 languages (Rust, Go, Python, JavaScript, TypeScript, C), totaling 193,635 commits. The comparison is pgit's actual compressed data size versus `git gc --aggressive` packfile size, the best git can do.
+Here's where it gets interesting. I benchmarked pgit against git on 20 real repositories across 6 languages (Rust, Go, Python, JavaScript, TypeScript, C), totaling 273,703 commits. The comparison is pgit's actual compressed data size versus `git gc --aggressive` packfile size, the best git can do.
 
-**The scorecard: pgit 9 wins, git 9 wins, 1 tie.**
+**The scorecard: pgit 12 wins, git 8 wins.**
 
 | Repository | Commits | Raw Size | git --aggressive | pgit | Winner |
 |:-----------|--------:|---------:|-----------------:|-----:|:-------|
-| serde | 4,352 | 203.5 MB | 5.6 MB | 3.9 MB | pgit (30%) |
-| ripgrep | 2,207 | 111.8 MB | 3.0 MB | 2.9 MB | pgit (3%) |
-| tokio | 4,394 | 195.5 MB | 8.3 MB | 7.7 MB | pgit (7%) |
-| fzf | 3,482 | 209.2 MB | 3.4 MB | 2.7 MB | pgit (21%) |
-| gin | 1,961 | 51.7 MB | 1.9 MB | 1.6 MB | pgit (16%) |
-| flask | 5,506 | 165.6 MB | 6.0 MB | 5.5 MB | pgit (8%) |
-| express | 6,128 | 150.0 MB | 5.8 MB | 5.2 MB | pgit (10%) |
-| core (Vue) | 6,930 | 598.9 MB | 11.6 MB | 9.9 MB | pgit (15%) |
-| curl | 37,818 | 3.3 GB | 48.4 MB | 45.0 MB | pgit (7%) |
-| cli (GitHub) | 10,776 | 287.3 MB | 41.8 MB | 41.8 MB | tie |
-| cargo | 21,833 | 1.2 GB | 29.8 MB | 30.3 MB | git (2%) |
-| requests | 6,405 | 112.4 MB | 9.3 MB | 9.5 MB | git (2%) |
-| svelte | 10,948 | 779.1 MB | 96.4 MB | 102.6 MB | git (6%) |
-| react | 21,368 | 2.2 GB | 104.9 MB | 121.4 MB | git (16%) |
-| redis | 12,936 | 2.0 GB | 71.6 MB | 76.9 MB | git (7%) |
-| ruff | 14,116 | 2.8 GB | 51.0 MB | 56.6 MB | git (11%) |
-| prettier | 11,084 | 2.0 GB | 66.2 MB | 96.4 MB | git (46%) |
-| jq | 1,871 | 121.2 MB | 3.9 MB | 5.1 MB | git (31%) |
-| hugo | 9,520 | 569.3 MB | 108.8 MB | 222.9 MB | git (105%) |
+| serde | 4,353 | 203.5 MB | 5.6 MB | 3.9 MB | pgit (30%) |
+| ripgrep | 2,208 | 111.8 MB | 3.0 MB | 2.7 MB | pgit (10%) |
+| tokio | 4,403 | 195.7 MB | 8.3 MB | 7.7 MB | pgit (7%) |
+| cargo | 21,850 | 1.2 GB | 29.9 MB | 29.8 MB | pgit (0%) |
+| fzf | 3,499 | 213.3 MB | 3.5 MB | 3.0 MB | pgit (14%) |
+| gin | 1,967 | 51.7 MB | 1.9 MB | 1.7 MB | pgit (11%) |
+| cli (GitHub) | 10,820 | 288.6 MB | 41.8 MB | 41.3 MB | pgit (1%) |
+| flask | 5,516 | 167.3 MB | 6.1 MB | 5.5 MB | pgit (10%) |
+| requests | 6,405 | 112.4 MB | 9.3 MB | 9.1 MB | pgit (2%) |
+| express | 6,128 | 150.0 MB | 5.8 MB | 5.7 MB | pgit (2%) |
+| core (Vue) | 6,930 | 598.9 MB | 11.6 MB | 11.2 MB | pgit (3%) |
+| svelte | 10,982 | 782.7 MB | 96.5 MB | 96.0 MB | pgit (1%) |
+| ruff | 14,206 | 2.8 GB | 51.3 MB | 51.4 MB | git (0%) |
+| hugo | 9,538 | 570.6 MB | 108.8 MB | 111.0 MB | git (2%) |
+| prettier | 11,084 | 2.0 GB | 66.1 MB | 91.1 MB | git (38%) |
+| react | 21,378 | 2.2 GB | 105.0 MB | 112.3 MB | git (7%) |
+| jq | 1,871 | 121.2 MB | 3.9 MB | 4.2 MB | git (8%) |
+| redis | 12,940 | 2.0 GB | 71.6 MB | 76.9 MB | git (7%) |
+| curl | 37,860 | 3.3 GB | 48.4 MB | 49.3 MB | git (2%) |
+| git | 79,765 | 7.3 GB | 90.6 MB | 111.3 MB | git (23%) |
 
-Let me put this in perspective. `git gc --aggressive` is git's best compression mode. It's significantly slower than normal `git gc` and is designed to squeeze out every byte. pgit **goes head-to-head with it on compression while making the entire history SQL-queryable**. And against normal `git gc` (the numbers are in the [full benchmark](https://github.com/ImGajeed76/pgit/blob/main/BENCHMARK.md)), pgit wins on the vast majority of repositories.
+Let me put this in perspective. `git gc --aggressive` is git's best compression mode. It's significantly slower than normal `git gc` and is designed to squeeze out every byte. pgit **outcompresses it on the majority of repositories while making the entire history SQL-queryable**. Against normal `git gc` (the numbers are in the [full benchmark](https://github.com/ImGajeed76/pgit/blob/main/BENCHMARK.md)), pgit wins on nearly every repository.
 
 ![Compression Ratio (higher is better)](https://raw.githubusercontent.com/ImGajeed76/oseifert-data/master/data/blog/images/pgit-compression-ratio.png)
 
 ![Stored Size in MB (lower is better)](https://raw.githubusercontent.com/ImGajeed76/oseifert-data/master/data/blog/images/pgit-stored-size.png)
 
-There's a clear pattern in the results. pgit wins on source-code-heavy repositories with incremental changes: serde, fzf, Vue core, express, curl. These are exactly the kind of repositories where delta compression shines, because most commits change a few lines in a few files, and consecutive versions of each file are highly similar.
+The results split along a clear line. pgit wins on repositories where most changes are incremental edits to source code, which is the majority of the benchmark suite. Delta compression within each file's version chain captures most of the redundancy, and pgit's path-to-group mapping deduplicates content from renames, copies, and reverts automatically by grouping related files into shared delta chains.
 
-Git wins on repositories with large vendored dependencies, binary assets, or generated test fixtures: hugo, prettier, react. Hugo is the most extreme case (105% larger) because it vendors a lot of theme and asset files that are similar across different paths. Git's packfile format can deduplicate across files (noticing that `vendor/foo.js` is similar to `vendor/bar.js`), while pgit compresses within each file's version chain independently.
+Git pulls ahead on repositories with heavy cross-file similarity between *unrelated* files: prettier (38%), git/git (23%). Git's packfile format can delta-compress any object against any other object in the entire repository, regardless of file path. pgit deduplicates renamed and copied files, but unrelated files with similar content are compressed independently.
 
-I'm not going to pretend pgit beats git everywhere. It doesn't. pgit wins on source-code-heavy repos; git wins on repos with large vendored or binary content, and git's wins there tend to be larger in magnitude. But going head-to-head with git's *best* compression mode while adding full SQL queryability on top? I'll take that trade any day.
+What surprised me is how far targeted deduplication gets you. Grouping related files into shared delta chains, without git's arbitrary cross-object matching, beats git's best mode on 12 out of 20 repositories. And you get SQL queryability on top.
 
 ### It's Not Just About Storage
 
-You might expect that storing everything in delta-compressed PostgreSQL tables would kill query performance. It doesn't. Here are real numbers on the **git/git repository** (79,000 commits, 7,278 files):
+You might expect that storing everything in delta-compressed PostgreSQL tables would kill query performance. It doesn't. Here are real numbers on the **git/git repository** (79,765 commits, 7,291 files):
 
 | Command | Time |
 |---------|------|
@@ -231,7 +232,7 @@ If you run into bugs or have a compelling feature idea, issues and PRs are welco
 If you want to try pgit:
 
 ```bash
-go install github.com/imgajeed76/pgit/v3/cmd/pgit@latest
+go install github.com/imgajeed76/pgit/v4/cmd/pgit@latest
 ```
 
 - **pgit**: [github.com/ImGajeed76/pgit](https://github.com/ImGajeed76/pgit)
