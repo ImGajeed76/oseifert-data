@@ -9,6 +9,7 @@ import { loadBlogPosts } from './blog-parser.ts';
 import { fetchDevToArticles } from './devto.ts';
 import type { Project, BlogPost, RawRepo } from './types.ts';
 import { generateDiscovery } from './discovery.ts';
+import { rewriteMediaUrls } from './utils/media-urls.ts';
 
 const ROOT_DIR = resolve(import.meta.dirname, '..');
 const BLOG_DIR = join(ROOT_DIR, 'data', 'blog');
@@ -86,6 +87,12 @@ async function enrichRepo(
 		repo._client.fetchPermission(repo.owner.login, repo.name),
 	]);
 
+	// Rewrite embedded media URLs in READMEs so relative / GitHub blob links
+	// point to raw.githubusercontent.com (GitHub repos only).
+	const readmeFixed = repo._platform === 'github'
+		? rewriteMediaUrls(readme, repo.owner.login, repo.name)
+		: readme;
+
 	const languages = processLanguages(rawLangs, getLanguageColor);
 	const role = deriveRole(repo.owner.login, repo.owner.type, repo._client.username, roleName);
 	const pinned = repo._platform === 'github' && pinnedRepoNames.has(repo.full_name);
@@ -118,7 +125,7 @@ async function enrichRepo(
 		primaryLanguage: languages[0]?.name || '',
 		owner: repo.owner.login,
 		role,
-		readme,
+		readme: readmeFixed,
 		linkedBlogPosts,
 		pinned,
 	};

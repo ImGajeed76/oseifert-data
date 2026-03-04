@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { parse as parseYaml } from 'yaml';
 import type { BlogPost } from './types.ts';
+import { rewriteMediaUrls } from './utils/media-urls.ts';
 
 interface BlogFrontmatter {
 	title: string;
@@ -49,6 +50,17 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 	const isDraft = frontmatter.draft ?? false;
 	const slug = isDraft ? `draft-${hashSlug(frontmatter.slug)}` : frontmatter.slug;
 
+	// Rewrite embedded media URLs so relative paths (e.g. ./images/foo.png)
+	// resolve to raw.githubusercontent.com in this repo.
+	// Blog files live under data/blog/, so relative paths need that prefix.
+	const rewrittenContent = rewriteMediaUrls(
+		content,
+		'ImGajeed76',
+		'oseifert-data',
+		'master',
+		'data/blog',
+	);
+
 	return {
 		slug,
 		title: frontmatter.title,
@@ -57,7 +69,7 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 		updated: frontmatter.updated ? normalizeDate(frontmatter.updated) : null,
 		tags: frontmatter.tags || [],
 		projects: frontmatter.projects || [],
-		content,
+		content: rewrittenContent,
 		draft: isDraft,
 		readingTime,
 		externalUrl: frontmatter.externalUrl || null,
