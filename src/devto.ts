@@ -10,6 +10,7 @@ interface DevToArticle {
 	tag_list: string[];
 	slug: string;
 	reading_time_minutes: number;
+	canonical_url: string | null;
 }
 
 interface DevToArticleFull extends DevToArticle {
@@ -45,7 +46,11 @@ export async function fetchDevToArticles(username: string): Promise<BlogPost[]> 
 
 		const data = (await res.json()) as DevToArticle[];
 		if (data.length === 0) break;
-		articles.push(...data);
+		// Skip articles with a canonical URL pointing to oseifert.ch (already on the website)
+		const exclusive = data.filter(
+			(a) => !a.canonical_url || !a.canonical_url.includes('oseifert.ch')
+		);
+		articles.push(...exclusive);
 		page++;
 	}
 
