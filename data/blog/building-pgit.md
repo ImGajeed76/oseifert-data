@@ -3,7 +3,7 @@ title: "pgit: What If Your Git History Was a SQL Database?"
 slug: building-pgit
 date: "2026-03-16"
 tags: [postgresql, git, compression, delta-encoding, go, open-source, ai-agents]
-projects: []
+projects: [pgit-1143, pg-xpatch-1137]
 excerpt: "I built a Git-like CLI backed by PostgreSQL with delta compression. Benchmarked on 20 real repos totaling 274k commits, it outcompresses git gc --aggressive on 12 out of 20 repositories while making your entire commit history SQL-queryable."
 draft: false
 ---
