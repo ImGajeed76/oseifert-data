@@ -1,11 +1,11 @@
 ---
 title: "pgit: What If Your Git History Was a SQL Database?"
 slug: building-pgit
-date: "2026-02-16"
+date: "2026-03-16"
 tags: [postgresql, git, compression, delta-encoding, go, open-source, ai-agents]
 projects: []
 excerpt: "I built a Git-like CLI backed by PostgreSQL with delta compression. Benchmarked on 20 real repos totaling 274k commits, it outcompresses git gc --aggressive on 12 out of 20 repositories while making your entire commit history SQL-queryable."
-draft: true
+draft: false
 ---
 
 **TL;DR:** Built a Git-like CLI backed by PostgreSQL with automatic delta compression. Import any git repo, query its entire history with SQL. Benchmarked on 20 real repositories (273,703 commits): pgit outcompresses `git gc --aggressive` on 12 out of 20 repositories, while giving you full SQL access to every commit, file version, and change pattern. Then I gave an AI agent a single prompt and it produced a full codebase health report on Neon's own repo in under 10 minutes.
@@ -83,7 +83,7 @@ So I started building pg-xpatch: a proper PostgreSQL Table Access Method that do
 
 But I needed to benchmark it. And from my xpatch work, I already knew that git history is the perfect test corpus: millions of incremental text changes across thousands of files, easy to obtain, representative of real-world editing patterns. So I started importing git repositories into PostgreSQL to stress-test the compression.
 
-And at some point the benchmark tool became the actual project. That became pgit. It turned out to be the best decision I could have made, not just as a product, but as dogfood. Running pgit against real repositories surfaced bugs, edge cases, and performance problems in pg-xpatch that no synthetic benchmark would have caught. Things like: what happens when a single file has 79,000 versions in one delta chain? What about repositories with 30,000+ files per commit? pg-xpatch now has 450+ tests and handles all of it without issues.
+And at some point the benchmark tool became the actual project. That became pgit. It turned out to be the best decision I could have made, not just as a product, but as dogfood. Running pgit against real repositories surfaced bugs, edge cases, and performance problems in pg-xpatch that no synthetic benchmark would have caught. Things like: what happens when a single file has 79,000 versions in one delta chain? What about repositories with 30,000+ files per commit? pg-xpatch now has 570+ tests and handles all of it without issues.
 
 ## Benchmarks: git vs pgit
 
