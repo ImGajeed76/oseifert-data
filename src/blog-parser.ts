@@ -44,7 +44,10 @@ function parseBlogFile(raw: string, filename: string): BlogPost {
 		throw new Error(`Missing required frontmatter fields in ${filename} (need title, slug, date)`);
 	}
 
-	const wordCount = content.split(/\s+/).filter(Boolean).length;
+	// Exclude <details> blocks from word count — they're collapsible extras,
+	// not part of the main reading flow
+	const visibleContent = content.replace(/<details>[\s\S]*?<\/details>/g, '');
+	const wordCount = visibleContent.split(/\s+/).filter(Boolean).length;
 	const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
 	const isDraft = frontmatter.draft ?? false;
