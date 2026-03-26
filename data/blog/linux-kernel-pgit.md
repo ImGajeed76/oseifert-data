@@ -12,13 +12,9 @@ draft: true
 
 ---
 
-## Read the pgit post first
-
-This post builds on [pgit: What If Your Git History Was a SQL Database?](https://oseifert.ch/blog/building-pgit). If you haven't read it, start there. Short version: pgit is a Git-like CLI where everything lives in PostgreSQL instead of the filesystem. You get the familiar workflow (init, add, commit, diff, blame), but your repository is a database. It uses [pg-xpatch](https://github.com/ImGajeed76/pg-xpatch) for transparent delta compression and makes your entire commit history SQL-queryable.
-
-After the pgit post hit the HN front page and got picked up by TLDR, console.dev, and dailydev, I teased that I was importing the Linux kernel. Here's what happened.
-
 ## The import
+
+This post builds on [pgit: What If Your Git History Was a SQL Database?](https://oseifert.ch/blog/building-pgit). If you haven't read it, start there. Short version: pgit is a Git-like CLI where everything lives in PostgreSQL instead of the filesystem. It uses [pg-xpatch](https://github.com/ImGajeed76/pg-xpatch) for transparent delta compression and makes your entire commit history SQL-queryable. After the pgit post hit the HN front page and got picked up by TLDR, console.dev, and dailydev, I teased that I was importing the Linux kernel. Here's what happened.
 
 The Linux kernel is arguably the ultimate stress test for any version control system. 1.4 million commits spanning 20 years, 171,000 files, 38,000 contributors. From what I've found, only a handful of VCS besides git have ever managed a full import of the kernel's history. Fossil (SQLite-based, by the SQLite team) never did. Darcs and Monotone attempted it with severe performance problems. Mercurial can do it. Correct me if I'm wrong on any of this.
 
@@ -426,7 +422,7 @@ David S. Miller (networking) is the single busiest merge point: 7.9% of all kern
 
 Intel is #1 by volume (83K commits, 1,704 engineers). Red Hat is #2 but with the most productive team: 110 commits per engineer. The kernel.org maintainers (227 people) average 306 commits each. These are the elite core.
 
-Amazon stands out at the bottom: 14 commits per person. They're focused on Xen/KVM virtualization for AWS, not broad kernel work.
+Amazon stands out at the bottom: 14 commits per person. They're focused on Xen/KVM virtualization for AWS, not broad kernel work. (Note: IBM shows only 53 commits because their engineers use `@linux.ibm.com` and `@linux.vnet.ibm.com`, landing them in the "Other" bucket. Similarly, many Huawei engineers use `@hisilicon.com`.)
 
 Individual contributors (Gmail addresses, a proxy for hobbyists) peaked at 12% of all commits in 2010. By 2025, that's down to 8%. The absolute numbers are stable (~7K/year), but the kernel has become more corporate over time.
 
@@ -442,8 +438,6 @@ Individual contributors (Gmail addresses, a proxy for hobbyists) peaked at 12% o
 | 2018 | 7,393 | 80,330 | 9% |
 | 2022 | 7,438 | 86,810 | 8% |
 | 2025 | 7,160 | 85,163 | 8% |
-
-Note: IBM shows only 53 commits because their engineers use `@linux.ibm.com` and `@linux.vnet.ibm.com`, landing them in the "Other" bucket. Similarly, many Huawei engineers use `@hisilicon.com`.
 
 </details>
 
