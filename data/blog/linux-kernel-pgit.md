@@ -5,7 +5,7 @@ date: "2026-03-26"
 tags: [postgresql, git, linux-kernel, compression, delta-encoding, go, open-source, data-analysis]
 projects: [pgit-1143, pg-xpatch-1137, xpatch-1111]
 excerpt: "I imported the entire Linux kernel git history into pgit's PostgreSQL-backed storage. 1,428,882 commits, 24.4 million file versions, 20 years of development. Here's what the kernel looks like when you can just ask."
-draft: true
+draft: false
 ---
 
 **TL;DR:** Imported the full Linux kernel history into pgit. 1,428,882 commits, 24.4 million file versions, 20 years of development, stored in PostgreSQL with delta compression. Actual data: 2.7 GB (git gc --aggressive gets 1.95 GB). The import took 2 hours on a dedicated server. Then I started asking questions. 7 f-bombs in 1.4 million commit messages (all from 2 people). 665 bug fixes pointing at a single commit. A filesystem that took 13 years to merge. Here's what the Linux kernel looks like as a SQL database.
