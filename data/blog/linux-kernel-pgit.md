@@ -16,7 +16,7 @@ draft: true
 
 This post builds on [pgit: What If Your Git History Was a SQL Database?](https://oseifert.ch/blog/building-pgit). If you haven't read it, start there. Short version: pgit is a Git-like CLI where everything lives in PostgreSQL instead of the filesystem. It uses [pg-xpatch](https://github.com/ImGajeed76/pg-xpatch) for transparent delta compression and makes your entire commit history SQL-queryable. After the pgit post hit the HN front page and got picked up by TLDR, console.dev, and dailydev, I teased that I was importing the Linux kernel. Here's what happened.
 
-The Linux kernel is arguably the ultimate stress test for any version control system. 1.4 million commits spanning 20 years, 171,000 files, 38,000 contributors. From what I've found, only a handful of VCS besides git have ever managed a full import of the kernel's history. Fossil (SQLite-based, by the SQLite team) never did. Darcs and Monotone attempted it with severe performance problems. Mercurial can do it. Correct me if I'm wrong on any of this.
+The Linux kernel is one of the largest actively developed repositories in the world. 1.4 million commits spanning 20 years, 171,000 files, 38,000 contributors. From what I've found, only a handful of VCS besides git have ever managed a full import of the kernel's history. Fossil (SQLite-based, by the SQLite team) never did. Darcs and Monotone attempted it with severe performance problems. Mercurial can do it. Correct me if I'm wrong on any of this.
 
 pgit handled it.
 
@@ -164,8 +164,6 @@ pgit v4 with a few local changes that weren't released at the time of the import
 - **`container/runtime.go`** — New `GetContainerImage()` function
 - Docs/text cleanup across README, sql.go, commits.go, ulid.go, config/reflect.go
 
-It should also work with the current released pgit version, but the `seq` ordering fix makes commit table scans dramatically faster.
-
 ### pgit configuration
 
 ```bash
@@ -278,10 +276,10 @@ Let's be honest about the numbers.
 | | Size | Ratio |
 |:---|---:|---:|
 | Raw uncompressed objects | 144.43 GB | 1.0x |
-| git gc (normal) | 5.79 GB | 24.9x |
-| git gc --aggressive | 1.95 GB | 74.1x |
 | **pgit (on-disk)** | **6.6 GB** | **21.9x** |
+| git gc (normal) | 5.79 GB | 24.9x |
 | **pgit (actual data)** | **2.7 GB** | **53.5x** |
+| git gc --aggressive | 1.95 GB | 74.1x |
 
 git gc --aggressive wins. 1.95 GB vs pgit's 2.7 GB of actual data. About 38% smaller.
 
@@ -312,6 +310,8 @@ But the comparison isn't really about bytes. `git gc --aggressive` takes 25 minu
 | **Actual data** | **2.7 GB** |
 | PostgreSQL overhead + indexes | 3.9 GB |
 
+*Note: The second table strips PostgreSQL overhead from each component, so the rows won't sum to match the on-disk table above.*
+
 171,525 paths collapsed into 137,600 delta groups (rename/copy detection). 7.9x blob deduplication: 24.4M file refs point to only 3.1M unique content versions.
 
 </details>
@@ -322,11 +322,13 @@ Everything below was queried directly from PostgreSQL. Most queries completed in
 
 ### 38,506 authors. 36% never came back.
 
-The kernel has 38,506 unique authors (by email) but only 1,540 unique committers. A 25:1 ratio. Nearly 14,000 people made exactly one commit and moved on. They fixed one bug, added one feature, and never returned.
+The kernel has 38,506 unique authors (by email) but only 1,540 unique committers. In the kernel's mailing list workflow, you write a patch and a maintainer merges it. So 38,506 people wrote code, but only 1,540 had merge authority. A 25:1 ratio.
+
+Nearly 14,000 of those authors contributed exactly one patch and never came back.
 
 ### 90% of commits touch 5 files or fewer
 
-| Files Touched | Commits | Share |
+| Files Touched | Commits | % of total |
 |:---|---:|---:|
 | 1 file | 875,541 | 61.3% |
 | 2-5 files | 414,018 | 29.0% |
@@ -334,7 +336,7 @@ The kernel has 38,506 unique authors (by email) but only 1,540 unique committers
 | 11-50 files | 49,700 | 3.5% |
 | 51+ files | 18,523 | 1.3% |
 
-The kernel's "one logical change per commit" isn't a guideline. It's enforced culture, visible in the data. The largest single commit touched 53,003 files, but every single one of the top 5 biggest commits turned out to be merge commits from subsystem maintainers. Not sweeping API changes. Just plumbing.
+The kernel's "one logical change per commit" rule holds up. The largest single commit touched 53,003 files, but every single one of the top 5 biggest commits turned out to be merge commits from subsystem maintainers. Not sweeping API changes. Just plumbing.
 
 ### File coupling: the hidden dependencies
 
@@ -380,18 +382,18 @@ Btrfs has 7 entries in the top 30, all radiating from `ctree.h`. That single hea
 
 ### Three people merge 22.5% of all commits
 
-| Committer | Patches Merged | Self-Authored | Amplification |
+| Committer | Patches Merged | Self-Authored | Merge Ratio |
 |:---|---:|---:|---:|
 | David S. Miller | 113,456 | 15,617 | 7.3x |
 | Greg Kroah-Hartman | 105,733 | 7,073 | 15.0x |
 | Linus Torvalds | 102,322 | 45,125 | 2.3x |
 
-David S. Miller (networking) is the single busiest merge point: 7.9% of all kernel commits flow through him. Greg Kroah-Hartman has the most extreme amplification: he authored 7K patches but merged 106K. A 15:1 ratio. He's the kernel's silent gatekeeper. The quietest of all: John W. Linville at 16.5x, merging 18.9K patches while writing only 1.1K himself.
+David S. Miller (networking) is the single busiest merge point: 7.9% of all kernel commits flow through him. Greg Kroah-Hartman authored 7K patches but merged 106K. 15:1. John W. Linville is even more lopsided: 18.9K merged, 1.1K written. 16.5:1.
 
 <details>
 <summary>Full committer table (top 10)</summary>
 
-| Committer | Patches Merged | Self-Authored | Amplification |
+| Committer | Patches Merged | Self-Authored | Merge Ratio |
 |---|---|---|---|
 | David S. Miller | 113,456 | 15,617 | 7.3x |
 | Greg Kroah-Hartman | 105,733 | 7,073 | 15.0x |
@@ -441,27 +443,15 @@ Individual contributors (Gmail addresses, a proxy for hobbyists) peaked at 12% o
 
 </details>
 
-### The Fixes: tag revolution
-
-The `Fixes:` tag (referencing the exact commit that introduced a bug) went from nonexistent to ubiquitous:
-
-| Year | Commits with Fixes: | Percentage |
-|:---|---:|---:|
-| 2005-2012 | 0-76 | <0.1% |
-| 2014 | 1,633 | 2% |
-| 2018 | 9,357 | 11% |
-| 2022 | 14,545 | 16% |
-| 2026 (partial) | 2,738 | **26%** |
-
-From 0% to 26% in a decade. This is a cultural revolution visible purely through commit message data. The kernel community went from "just describe the fix" to "you MUST cite the exact commit that introduced the bug." By 2026, more than 1 in 4 commits references a specific fix target.
-
 ### The "buggiest" commit in Linux history
 
-Commit `1da177e4c3f4`. Linus Torvalds's initial git import. April 16, 2005. **665 downstream Fixes: references.**
+The kernel has a convention: the `Fixes:` tag in a commit message references the exact commit that introduced a bug. By 2026, more than 1 in 4 commits use it (up from basically zero before 2013).
 
-It's not buggy in the traditional sense. When a bug has existed "forever" and there's no specific commit that introduced it, developers use `Fixes: 1da177e4c3f4` as shorthand for "this was always broken." It's the kernel's original sin. Every pre-existing bug traces back to it.
+The commit with the most Fixes: references? `1da177e4c3f4`. Linus Torvalds's initial git import. April 16, 2005. **665 bug fixes pointing back at it.**
 
-The second-most-fixed commit: `dd08ebf6c352`, Intel's Xe GPU driver introduction. 196 fixes in ~2 years. That's one bug fix every 4 days since the driver landed. Every major driver introduction is a bug factory.
+It's not actually buggy. When a bug has existed "forever" and there's no specific commit to blame, developers cite `1da177e4c3f4` as shorthand for "this was always broken."
+
+The second-most-fixed: `dd08ebf6c352`, Intel's Xe GPU driver introduction. 196 fixes in ~2 years. One bug fix every 4 days since the driver landed.
 
 ### Polite commits, angry code
 
@@ -474,12 +464,10 @@ But the source code tells a different story. `pgit search "fuck" --path "*.c" --
 - *"fucking gcc"* (XFS B-tree header, twice)
 - *"If you fuck with this, update ret_from_syscall code too"* (SPARC architecture)
 
-The commit messages are the public face. The code is where developers say what they really think.
-
 <details>
 <summary>Full profanity count in commit messages</summary>
 
-Using PostgreSQL word boundary regex (`\y`) to avoid false positives ("ass" matching "class", "hell" matching "shell"):
+These counts are from **commit messages only**, not source code. Using PostgreSQL word boundary regex (`\y`) to avoid false positives ("ass" matching "class", "hell" matching "shell"):
 
 | Word | Count | Notes |
 |---|---|---|
@@ -514,15 +502,9 @@ All three are in memory management or staging. Subsystems where changes have far
 
 ### Kent Overstreet: 13 years, one filesystem
 
-| Year | Commits | Phase |
-|:---|---:|:---|
-| 2011 | 1 | First commit (bcache block cache) |
-| 2013 | 213 | bcache lands in mainline |
-| 2014-2017 | 4-34/yr | **Dormant.** Rewriting the entire filesystem out-of-tree. |
-| 2023 | 904 | **bcachefs merged into mainline** (kernel 6.7) |
-| 2024 | 1,194 | Peak year |
+Kent Overstreet's first kernel commit was in 2011: bcache, a block cache layer. By 2013 it was in mainline with 213 commits. Then he went quiet. 4 to 34 commits per year from 2014 to 2017, rewriting the whole thing out-of-tree into a full filesystem.
 
-He codes on New Year's Day across 3 different years, between 1am and 4am. 27% of his commits are on weekends. When the merge was controversial, he kept going. A 13-year journey from block cache to filesystem.
+In 2023, bcachefs merged into mainline (kernel 6.7). 904 commits that year. 1,194 the next. He codes on New Year's Day across 3 different years, between 1am and 4am. 27% of his commits are on weekends. When the merge was controversial, he kept going.
 
 <details>
 <summary>More kernel stories</summary>
@@ -564,31 +546,6 @@ Jeff Garzik averages 161 bytes per commit message. Filipe Manana (Btrfs) average
 drm/amd/display (191 reverts) + drm/amdgpu (127) + drm/i915 (147) = 516 GPU reverts, nearly 10% of all reverts in the entire kernel. Display code has complex hardware interactions, power management state machines, and regression-sensitive userspace APIs.
 
 </details>
-
-### Rust's hockey stick
-
-| Period | Monthly Commits |
-|:---|---:|
-| Jul 2021 | 27 (first Rust patches) |
-| Oct 2022 | 288 (merged into mainline, kernel 6.1) |
-| Sep 2024 | 666 (acceleration begins) |
-| Dec 2025 | **1,934** (70x the initial rate) |
-
-From 27 commits in its first month to nearly 2,000 per month by late 2025. The acceleration started when Rust driver abstractions began landing in mid-2024. Only 381 Rust files exist today (0.2% of all kernel files), but it's one of the fastest-growing subsystems.
-
-### MAINTAINERS
-
-27,969 versions. 3,728 different people have edited this file. That's 9.7% of all kernel contributors.
-
-It's changed 1,000-2,300 times per year since 2012, and the rate is accelerating (2025 is on pace for the most ever). Every new driver, subsystem, or maintainer change touches it. It's the closest thing the kernel has to a community guestbook.
-
-The original MAINTAINERS file from April 16, 2005 (reconstructed by pgit in 4.2 seconds from delta-compressed storage) starts with a charmingly informal guide:
-
-> *"1. Always test your changes, however small, on at least 4 or 5 people, preferably many more."*
->
-> *"7. Happy hacking."*
-
-Twenty years and 3,728 editors later, step 7 remains good advice.
 
 ## Query performance
 
@@ -674,20 +631,6 @@ pgit search "fuck" --path "*.c" --path "*.h" --all
 pgit sql "SELECT author_name, authored_at::date, LEFT(message, 200)
   FROM pgit_commits
   WHERE message ILIKE 'Revert \"Revert \"Revert%%'"
-
-# Rust growth (0.5s)
-pgit sql "SELECT EXTRACT(YEAR FROM c.authored_at)::int as year,
-  EXTRACT(MONTH FROM c.authored_at)::int as month, COUNT(*) as commits
-  FROM pgit_file_refs r JOIN pgit_paths p ON p.path_id = r.path_id
-  JOIN pgit_commits c ON c.id = r.commit_id
-  WHERE p.path LIKE 'rust/%%' OR p.path LIKE '%%.rs'
-  GROUP BY year, month ORDER BY year, month"
-
-# MAINTAINERS authors (~30s)
-pgit sql "SELECT p.path, COUNT(DISTINCT c.author_email) as authors
-  FROM pgit_file_refs r JOIN pgit_paths p ON p.path_id = r.path_id
-  JOIN pgit_commits c ON c.id = r.commit_id
-  GROUP BY p.path ORDER BY authors DESC LIMIT 5"
 
 # Kent Overstreet trajectory (4.1s)
 pgit sql "SELECT EXTRACT(YEAR FROM authored_at)::int as year, COUNT(*)
