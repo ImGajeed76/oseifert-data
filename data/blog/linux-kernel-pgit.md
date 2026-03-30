@@ -271,8 +271,6 @@ time pgit import /root/linux --branch master --fastexport /root/linux.fastexport
 
 ## Compression
 
-Let's be honest about the numbers.
-
 | | Size | Ratio |
 |:---|---:|---:|
 | Raw uncompressed objects | 144.43 GB | 1.0x |
