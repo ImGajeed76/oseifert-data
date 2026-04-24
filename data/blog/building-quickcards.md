@@ -3,6 +3,7 @@ title: "Quizlet is gatekeeping more and more, so i made an extension"
 slug: building-quickcards
 date: "2026-04-24"
 tags: [typescript, browser-extension, quizlet, anki, flashcards, open-source]
+projects: [quick-cards-1171, ankipack-1215]
 excerpt: "Quizlet locked their free features and Knowt's import extension keeps missing cards. So i built quick-cards, a browser extension that exports Quizlet sets to txt, csv, pdf, Anki decks, and Knowt."
 draft: true
 ---
