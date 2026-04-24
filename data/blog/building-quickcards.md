@@ -5,7 +5,7 @@ date: "2026-04-24"
 tags: [typescript, browser-extension, quizlet, anki, flashcards, open-source]
 projects: [quick-cards-1171, ankipack-1215]
 excerpt: "Quizlet locked their free features and Knowt's import extension keeps missing cards. So i built quick-cards, a browser extension that exports Quizlet sets to txt, csv, pdf, Anki decks, and Knowt."
-draft: true
+draft: false
 ---
 
 **TL;DR:** Quizlet locked the learn mode and Knowt's import extension keeps missing cards. So i built quick-cards, a Chrome extension that grabs your Quizlet set and exports it to whatever you want (txt, csv, json, pdf, printable flashcards, Anki decks, or directly to Knowt). Chrome only for now, install instructions at [quickcards.oseifert.ch/install](https://quickcards.oseifert.ch/install).
