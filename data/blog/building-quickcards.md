@@ -2,6 +2,7 @@
 title: "Quizlet is gatekeeping more and more, so i made an extension"
 slug: building-quickcards
 date: "2026-04-24"
+updated: "2026-05-05"
 tags: [typescript, browser-extension, quizlet, anki, flashcards, open-source]
 projects: [quick-cards-1171, ankipack-1215]
 excerpt: "Quizlet locked their free features and Knowt's import extension keeps missing cards. So i built quick-cards, a browser extension that exports Quizlet sets to txt, csv, pdf, Anki decks, and Knowt."
@@ -46,7 +47,7 @@ And you got your set imported to Knowt in under 5 seconds!
 
 ## Install
 
-Currently the extension is Chrome only and not on the webstore. But there are good install instructions at [quickcards.oseifert.ch/install](https://quickcards.oseifert.ch/install) and if enough people actually use it i'll put it in the store. For now it's just not worth the hassle.
+The extension is Chrome only and you can grab it from the [Chrome Web Store](https://chromewebstore.google.com/detail/quickcards/kjbjdolelcchfcmainniifnpkgikjfkc). Originally i said i'd only bother with the store if enough people actually used it. Turns out enough people did. If you'd rather sideload it manually, install instructions are at [quickcards.oseifert.ch/install](https://quickcards.oseifert.ch/install).
 
 ---
 
